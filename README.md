@@ -1,2 +1,1 @@
-# nial
-An object-oriented programming language, implemented in the Ruby programming language.
+An object-oriented programming language written in Ruby
