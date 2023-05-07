@@ -1,0 +1,46 @@
+# Define a function that sorts an array
+# Parameter list is the list that should be sorted
+# Parameter func is a function that decides how the list should be sorted
+define function bubblesort(list, func)
+	length = call list.length()
+
+	# Bubblesort algoritm
+	swapped = False
+	count i from 1 to length
+		count j from 1 to length-1
+			if call func(list[j], list[j + 1]) then
+				swapped = True
+				temp = list[j]
+				list[j] = list[j + 1]
+				list[j + 1] = temp
+			stop
+		stop
+	
+		if not swapped then 
+			return list
+		stop
+	stop
+	return list
+stop
+
+
+# Create an list and fill it with 100 random values
+array = []
+count x from 1 to 100
+	call array.append(call RandOpManager.get_integer(1, 100))
+stop
+
+# Display the unsorted list
+display "UNSORTED LIST:"
+display array
+
+first = call TimeManager.now()
+# Call bubblesort with an anonymous function
+array = call bubblesort(array, | a, b | a > b |)
+second = call TimeManager.now()
+diff = second - first
+display "\n"
+# Display the sorted list
+display "SORTED LIST:"
+display array
+display call diff.convert_to_number()

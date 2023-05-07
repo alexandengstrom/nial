@@ -1,0 +1,5 @@
+define function test()
+       display "hello world"
+
+
+call test()

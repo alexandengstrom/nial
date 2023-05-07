@@ -1,0 +1,17 @@
+define type Person
+	age = Null
+	name = Null
+
+	define method constructor(a, n)
+		age = a
+		name = n
+	stop
+
+	define method addition(other)
+		return age + other
+	stop
+
+	define method multiplication(other)
+		return name * other
+	stop
+stop

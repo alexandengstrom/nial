@@ -1,0 +1,56 @@
+require './lexer/lexer.rb'
+require './exceptions/error.rb'
+require './parser/parser.rb'
+require './interpreter/interpreter.rb'
+require './interpreter/scope'
+require './lexer/position'
+
+
+def run(filename, scope)
+  data = File.read("./speedtest/#{filename}")
+  lexer = Lexer.new
+  if (result = lexer.tokenize(data, filename)).is_a?(Error)
+    puts result.display
+    return
+  end
+  parser = Parser.new(result)
+  if (result = parser.parse).is_a?(Error)
+    puts result.display
+    return
+  end
+  result = Interpreter.evaluate(result, scope)
+  if result.is_a?(Error)
+    puts result.display
+    return
+  end
+end
+
+
+start_time = Time.now
+filename = "speedtest.nial"
+pos = Position.new(filename, 1, 1)
+global_scope = Scope.new("global scope", nil, pos)
+run(filename, global_scope)
+end_time = Time.now
+nial = end_time - start_time
+
+start_time = Time.now
+eval(File.read("./speedtest/speedtest.rb"))
+end_time = Time.now
+ruby = end_time - start_time
+
+result = nial/ruby
+
+string = "#{Time.now.strftime("%d/%m/%Y %H:%M")}".ljust(15) + "\n\n"
+string += "Nial code executed in " + "#{nial.round(3)}" + " seconds" + "\n"
+string += "Ruby code executed in " + "#{ruby.round(3)}" + " seconds" + "\n\n"
+string += "Nial is #{result.round(3)} times slower than Ruby" + "\n\n" + "#{'='*50}\n" 
+
+puts string
+
+append_to_file = false
+if append_to_file
+  open("./speedtest/logfile.txt", "a") {|f|
+    f << string
+  }
+end

@@ -1,0 +1,23 @@
+define type Token
+	$ This type represents a token $
+	
+	type = Null
+	$ Stores the type of the token $
+	
+	value = Null
+	$ Stores the value of the token $
+	
+	define method constructor(t, v)
+	  $ Creates the token $
+		type = t
+		value = v
+	stop
+
+	define method get_type()
+		return type
+	stop
+
+	define method get_value()
+		return value
+	stop
+stop

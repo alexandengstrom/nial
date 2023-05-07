@@ -1,0 +1,20 @@
+20/03/2023 15:09
+
+Nial code executed in 0.536 seconds
+Ruby code executed in 0.004 seconds
+
+Nial is 147.31 times slower than Ruby
+
+- This is the initial test
+
+==================================================
+21/03/2023 23:03
+
+Nial code executed in 0.545 seconds
+Ruby code executed in 0.005 seconds
+
+Nial is 106.299 times slower than Ruby
+
+- Implemented try-blocks so added this to the tests, seems like this made the difference smaller. I have not tried to improve the speed of the code yet.
+
+==================================================

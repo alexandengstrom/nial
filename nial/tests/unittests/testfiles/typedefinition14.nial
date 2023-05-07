@@ -1,0 +1,4 @@
+define type Test
+	define method constructor()
+		x = 3
+stop

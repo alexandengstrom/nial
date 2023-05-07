@@ -1,0 +1,42 @@
+define type Base
+	first = Null
+	define method constructor(f)
+		first = f
+	stop
+
+	define method basemethod()
+		return "FROM BASE"
+	stop	
+stop
+
+define type Child
+	extend Base
+	second = Null
+	define method constructor(f, s)
+		call parent(f)
+		second = s
+	stop
+
+	define method childmethod()
+		return "FROM CHILD"
+	stop
+stop
+
+define type Baby
+	extend Child
+	third = Null
+	define method constructor(f, s, t)
+		call parent(f, s)
+		third = t
+	stop
+
+	define method basemethod()
+		return "OVERRIDE"
+	stop
+
+	define method set_first(new_value)
+		first = new_value
+	stop
+stop
+
+object = create Baby(1, 2)

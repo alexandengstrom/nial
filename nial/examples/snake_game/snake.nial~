@@ -1,0 +1,116 @@
+define type Snake
+	body = []
+	delta_x = 0
+	delta_y = 0
+	alive = True
+	eating = False
+	define method constructor(blocksize)
+		call body.append(call window.add(4, 4, blocksize, blocksize, "red"))
+	stop
+
+	define method find_direction()
+		key_pressed = call KeyboardManager.get_key()
+		if key_pressed then
+			if key_pressed == "UP ARROW" then
+				delta_y = -2
+				delta_x = 0
+			else if key_pressed == "DOWN ARROW" then
+				delta_y = 2
+				delta_x = 0
+			else if key_pressed == "LEFT ARROW" then
+				delta_x = -2
+				delta_y = 0
+			else if key_pressed == "RIGHT ARROW" then
+				delta_x = 2
+				delta_y = 0
+			stop
+		stop
+	stop
+
+	define method update()
+		call find_direction()
+		call move()
+		call intersecting()
+		if not call window.inside(body[1]) then alive = False stop
+	stop
+
+	define method get_head()
+		return body[1]
+	stop
+
+	define method move()
+	old_position = []
+		count node from 1 to call body.length()
+			if node == 1 then
+				old_position = call body[node].get_position()
+				call body[node].move(delta_y, delta_x)
+			else
+				temp_position = call body[node].get_position()
+				call body[node].set_position(old_position[1], old_position[2])
+				old_position = temp_position		
+			stop
+		stop
+
+		if eating then
+			call body.append(call window.add(old_position[1], old_position[2], block_size, block_size, "red"))
+			eating = False
+		stop
+			
+	stop
+
+	define method intersecting()
+		head = body[1]
+
+		if call body.length() < 2 then return stop
+		
+		count node from 2 to call body.length()
+			if call head.intersects_with(body[node]) then
+				alive = False
+			stop
+		stop
+	stop
+
+	define method eat()
+		eating = True
+	stop
+stop
+
+define function find_food_position()
+	found_position = False
+	new_x = 0
+	new_y = 0
+
+	while not found_position
+		new_x = call RandomGenerator.get_integer(0, window_width-block_size)
+		new_y = call RandomGenerator.get_integer(0, window_height-block_size)
+		if new_x % 2 == 1 then new_x = new_x - 1 stop
+		if new_y % 2 == 1 then new_y = new_y - 1 stop
+		call food.set_position(new_x, new_y)
+		found_position = True
+		for every node in snake@body
+			if call food.intersects_with(node) then
+				found_position = False
+			stop
+		stop
+	stop
+stop
+
+window_width = 50
+window_height = 50
+block_size = 1
+window = create Canvas()
+call window.set_dimensions(window_width, window_height)
+food = call window.add(20, 20, block_size, block_size, "blue")
+snake = create Snake(block_size)
+
+while snake@alive
+	call window.fill("green")
+	call window.update()
+	call window.render()
+	call snake.update()
+
+	if call snake.get_head().intersects_with(food) then
+		call snake.eat()
+		call find_food_position()
+	stop
+stop

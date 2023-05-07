@@ -1,0 +1,27 @@
+define type Base
+	first = Null
+	second = Null
+	define method constructor(x, y)
+		first = x
+		second = y
+	stop
+
+	define method change()
+		first = 10
+	stop
+stop
+
+define type Child
+	extend Base
+	
+	define method constructor(x, y)
+		call parent(x, y)
+	stop
+
+	define method cha()
+		second = 4
+	stop
+stop
+
+normal = create Child(1, 2)
+CONSTANT = create Child(3, 4)

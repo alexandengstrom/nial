@@ -1,0 +1,6 @@
+define function recursive(x)
+       y = 1 / (20 - x)
+       call recursive(x+1)
+stop
+
+call recursive(1)

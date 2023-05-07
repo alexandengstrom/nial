@@ -1,0 +1,16 @@
+define type Single
+	attribute = 3
+	define method constructor()
+	stop
+
+	define method get_attribute()
+		return attribute
+	stop
+
+	define method set_attribute(new_value)
+		attribute = new_value
+	stop
+		
+stop
+
+object = create Single()

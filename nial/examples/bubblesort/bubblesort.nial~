@@ -1,0 +1,28 @@
+define function bubblesort(list)
+	length = call list.length()
+
+	swapped = False
+	count i from 1 to length
+		count j from 1 to length-1
+			if list[j] > list[j + 1]
+				swapped = True
+				temp = list[j]
+				list[j] = list[j + 1]
+				list[j + 1] = temp
+			stop
+		stop
+	
+		if not swapped
+			return list
+		stop
+	stop
+	return list
+stop
+
+
+array = []
+count x from 1 to 100
+	call array.append(call RandOpManager.get_integer(1, 100))
+stop
+
+display array

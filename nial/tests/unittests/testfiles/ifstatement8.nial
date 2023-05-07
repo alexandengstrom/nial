@@ -1,0 +1,3 @@
+if 3 > 2
+   display 3
+stop

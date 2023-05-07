@@ -1,0 +1,17 @@
+# Run this file to run all available tests.
+
+require_relative "./unittests/test_lexer"
+require_relative "./unittests/test_parser"
+require_relative "./unittests/test_scope"
+require_relative "./unittests/test_number_datatype"
+require_relative "./unittests/test_text_datatype"
+require_relative "./unittests/test_boolean_datatype"
+require_relative "./unittests/test_list_datatype"
+require_relative "./unittests/test_dictionary_datatype"
+require_relative "./unittests/test_interpreter"
+require_relative "./unittests/test_if_statements"
+require_relative "./unittests/test_functions"
+require_relative "./unittests/test_count_loops"
+require_relative "./unittests/test_list"
+require_relative "./unittests/test_types"
+require_relative "./unittests/test_utilities"

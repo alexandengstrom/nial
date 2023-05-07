@@ -1,0 +1,27 @@
+###########################################
+# Create empty list
+
+x = []
+
+###########################################
+# Create list with one item
+
+x = [1]
+x = ["hello world"]
+x = [True]
+y = [x]
+
+###########################################
+# Create list and store a function
+
+define function double(num)
+	return num + num
+stop
+
+x = [double]
+
+###########################################
+# Store multiple items
+
+x = [1.2, 3.4, 2.4]
+x = ["hello world", 1, 0.00004, False, double]

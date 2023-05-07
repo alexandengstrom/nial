@@ -1,0 +1,67 @@
+use "nodes.nial"
+
+define type Parser
+	$ Represents the parser which will create the abstract syntax tree $
+	
+	tokens = Null
+	$ The list of tokens we receive from the lexer $
+
+	define method constructor(t)
+		$ Create the parser $
+		tokens = t
+	stop
+
+	define method move_cursor()
+		$ Gets the next token $
+		call tokens.pop_first()
+	stop
+
+	define method parse()
+		$ Start parsing the token stream $
+		return call parse_logical_expression()
+	stop
+
+	define method parse_logical_expression()
+	operators = [TokenType@AND, TokenType@OR]
+	return call parse_binary_operation(operators, parse_boolean_expression)
+	stop
+
+	define method parse_boolean_expression()
+	operators = [TokenType@LESS_THAN, TokenType@GREATER_THAN,
+							 TokenType@EQUALS]
+	return call parse_binary_operation(operators, parse_expression)
+	stop
+
+	define method parse_expression()
+		$ Parses an expression $
+		operators = [TokenType@ADDITION, TokenType@SUBTRACTION]
+		return call parse_binary_operation(operators, parse_term)
+	stop
+
+	define method parse_term()
+		$ Parses a term $
+		operators = [TokenType@DIVISION, TokenType@MULTIPLICATION]
+		return call parse_binary_operation(operators, parse_factor)
+	stop
+
+	define method parse_factor()
+	 	$ Parses a factor $
+		value = tokens[1]
+		call move_cursor()
+		return create NumberNode(value)
+	stop
+
+	define method parse_binary_operation(operators, func)
+		$ Parses a binary operation based on the operators and function it receives $
+		left = call func()
+		if call tokens.empty() then return left stop
+		while call operators.has_value(tokens[1]@type)
+			operator = tokens[1]@type
+			call move_cursor()
+			right = call  func()
+			left = create BinOpNode(left, right, operator)
+			if call tokens.empty() then break stop
+		stop
+		return left
+	stop
+stop

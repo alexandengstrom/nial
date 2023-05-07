@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE classes SYSTEM "classes.dtd">
+<documentation>
+  <types>
+    <type name="Token">
+      <description> This type represents a token </description>
+      <attributes>
+        <attribute name="type">
+          <description> Stores the type of the token </description>
+        </attribute>
+        <attribute name="value">
+          <description> Stores the value of the token </description>
+        </attribute>
+      </attributes>
+      <methods>
+        <method name="constructor">
+          <description> Creates the token </description>
+          <parameters>
+            <parameter name="t" copy="false"/>
+            <parameter name="v" copy="false"/>
+          </parameters>
+        </method>
+        <method name="get_type">
+          <description>not documented</description>
+          <parameters>
+          </parameters>
+        </method>
+        <method name="get_value">
+          <description>not documented</description>
+          <parameters>
+          </parameters>
+        </method>
+      </methods>
+    </type>
+    <type name="Lexer">
+      <description> The lexer is responsible for tokenizing a string </description>
+      <attributes>
+        <attribute name="available_tokens">
+          <description> Stores a list of available match patterns </description>
+        </attribute>
+      </attributes>
+      <methods>
+        <method name="constructor">
+          <description> Creates the lexer </description>
+          <parameters>
+          </parameters>
+        </method>
+        <method name="define_tokens">
+          <description> Define all the available match patterns </description>
+          <parameters>
+          </parameters>
+        </method>
+        <method name="tokenize">
+          <description> Takes a string as input, returns an token stream </description>
+          <parameters>
+            <parameter name="string" copy="false"/>
+          </parameters>
+        </method>
+      </methods>
+    </type>
+    <type name="BinOpNode">
+      <description> Represents a binary operation between two other nodes </description>
+      <attributes>
+        <attribute name="left">
+          <description> The left operand </description>
+        </attribute>
+        <attribute name="right">
+          <description> The right operand </description>
+        </attribute>
+        <attribute name="operator">
+          <description> The operator </description>
+        </attribute>
+      </attributes>
+      <methods>
+        <method name="constructor">
+          <description> Create the node </description>
+          <parameters>
+            <parameter name="l" copy="false"/>
+            <parameter name="r" copy="false"/>
+            <parameter name="o" copy="false"/>
+          </parameters>
+        </method>
+        <method name="evaluate">
+          <description> Evaluates the left node, right node and the result of the operation </description>
+          <parameters>
+          </parameters>
+        </method>
+      </methods>
+    </type>
+    <type name="NumberNode">
+      <description> Represents a number </description>
+      <attributes>
+        <attribute name="value">
+          <description> The value of the number </description>
+        </attribute>
+      </attributes>
+      <methods>
+        <method name="constructor">
+          <description> Create the node </description>
+          <parameters>
+            <parameter name="n" copy="false"/>
+          </parameters>
+        </method>
+        <method name="evaluate">
+          <description> Returns the value of the number </description>
+          <parameters>
+          </parameters>
+        </method>
+      </methods>
+    </type>
+    <type name="Parser">
+      <description> Represents the parser which will create the abstract syntax tree </description>
+      <attributes>
+        <attribute name="tokens">
+          <description> The list of tokens we receive from the lexer </description>
+        </attribute>
+      </attributes>
+      <methods>
+        <method name="constructor">
+          <description> Create the parser </description>
+          <parameters>
+            <parameter name="t" copy="false"/>
+          </parameters>
+        </method>
+        <method name="move_cursor">
+          <description> Gets the next token </description>
+          <parameters>
+          </parameters>
+        </method>
+        <method name="parse">
+          <description> Start parsing the token stream </description>
+          <parameters>
+          </parameters>
+        </method>
+        <method name="parse_expression">
+          <description> Parses an expression </description>
+          <parameters>
+          </parameters>
+        </method>
+        <method name="parse_term">
+          <description> Parses a term </description>
+          <parameters>
+          </parameters>
+        </method>
+        <method name="parse_factor">
+          <description> Parses a factor </description>
+          <parameters>
+          </parameters>
+        </method>
+        <method name="parse_binary_operation">
+          <description> Parses a binary operation based on the operators and function it receives </description>
+          <parameters>
+            <parameter name="operators" copy="false"/>
+            <parameter name="func" copy="false"/>
+          </parameters>
+        </method>
+      </methods>
+    </type>
+  </types>
+  <utilities>
+    <utility name="TokenType">
+      <description> Enum for representing token types </description>
+      <attributes>
+        <attribute name="SPACE">
+          <description> A space char </description>
+        </attribute>
+        <attribute name="NUMBER">
+          <description> A number </description>
+        </attribute>
+        <attribute name="ADDITION">
+          <description> The symbol + </description>
+        </attribute>
+        <attribute name="SUBTRACTION">
+          <description> The symbol - </description>
+        </attribute>
+        <attribute name="DIVISION">
+          <description> The symbol / </description>
+        </attribute>
+        <attribute name="MULTIPLICATION">
+          <description> The symbol * </description>
+        </attribute>
+      </attributes>
+      <methods>
+      </methods>
+    </utility>
+  </utilities>
+</documentation>

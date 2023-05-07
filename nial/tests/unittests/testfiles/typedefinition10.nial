@@ -1,0 +1,8 @@
+define type Test
+	attribute = 1/0
+
+	define method constructor()
+	stop
+stop
+
+x = create Test()

@@ -1,0 +1,12 @@
+use "lexer.nial"
+use "parser.nial"
+
+let user assign expression
+while expression != "exit"
+	lexer = create Lexer()
+	tokens = call lexer.tokenize(expression)
+	parser = create Parser(tokens)
+	ast = call parser.parse()
+	display call ast.evaluate()
+	let user assign expression
+stop

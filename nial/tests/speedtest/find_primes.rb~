@@ -1,0 +1,14 @@
+def is_prime(num)
+  for number in (2..num)
+    if num % number == 0 then return false end
+  end
+  return true
+end
+
+def find_primes(limit)
+  for number in (2..limit)
+    if is_prime(number) then puts number end
+  end
+end
+
+find_primes(1000)

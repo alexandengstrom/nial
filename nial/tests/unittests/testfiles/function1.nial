@@ -1,0 +1,72 @@
+define function func_x()
+       y = x + 2
+stop
+
+define function func_y(x)
+       y = 3 / x
+stop
+
+define function func_z(x, y, z)
+       a = x + y
+       b = z * a
+stop
+
+define function func_a(fun, num)
+       call fun(num)
+stop
+
+define function recursive(num)
+       if num < 20 then
+       	  call recursive(num+1)
+       stop
+stop
+
+define function check(bool)
+       if not bool then
+       	  3 / 0
+       stop
+stop
+
+define function newtest(num)
+       if num > 10 then
+       	  return 0
+       else
+          return 1
+       stop
+stop
+
+define function shouldbefalse()
+       return False
+stop
+
+define function shouldneverreacherror()
+       return Null
+       x = 1 / 0
+stop
+
+# Should not be an error since we never call this function
+define function divisionbyzero()
+       display 3 / 0
+stop
+ 
+
+x = 0
+y = 2
+
+call func_x()
+call func_y(y)
+call func_z(y, 2, "hello world")
+call func_a(func_y, y)
+call recursive(1)
+call check(True and True)
+
+# Can return 0 if return statement doesnt work as expected
+x = 1 / call newtest(8)
+
+# The function should return false
+if call shouldbefalse() then
+   3 / 0
+stop
+
+# Should return before division by zero.
+call shouldneverreacherror()

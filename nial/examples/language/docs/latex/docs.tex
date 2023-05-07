@@ -1,0 +1,85 @@
+\documentclass{article}
+\usepackage{amsmath}
+\title{Documentation}\begin{document}\maketitle\newpage\tableofcontents\newpage\section{Types}\subsection{Token}
+ This type represents a token \subsubsection*{Attributes}
+The type {\it Token} has the following attributes:
+
+\begin{itemize}
+\item {\bf type}:  Stores the type of the token 
+\item {\bf value}:  Stores the value of the token 
+\end{itemize}
+\subsubsection*{Methods}
+The type {\it Token} has the following methods:
+
+\begin{itemize}\item {\bf constructor(t, v)}:  Creates the token 
+\item {\bf get\_type()}: not documented
+\item {\bf get\_value()}: not documented
+\end{itemize}\subsection{Lexer}
+ The lexer is responsible for tokenizing a string \subsubsection*{Attributes}
+The type {\it Lexer} has the following attributes:
+
+\begin{itemize}
+\item {\bf available\_tokens}:  Stores a list of available match patterns 
+\end{itemize}
+\subsubsection*{Methods}
+The type {\it Lexer} has the following methods:
+
+\begin{itemize}\item {\bf constructor()}:  Creates the lexer 
+\item {\bf define\_tokens()}:  Define all the available match patterns 
+\item {\bf tokenize(string)}:  Takes a string as input, returns an token stream 
+\end{itemize}\subsection{BinOpNode}
+ Represents a binary operation between two other nodes \subsubsection*{Attributes}
+The type {\it BinOpNode} has the following attributes:
+
+\begin{itemize}
+\item {\bf left}:  The left operand 
+\item {\bf right}:  The right operand 
+\item {\bf operator}:  The operator 
+\end{itemize}
+\subsubsection*{Methods}
+The type {\it BinOpNode} has the following methods:
+
+\begin{itemize}\item {\bf constructor(l, r, o)}:  Create the node 
+\item {\bf evaluate()}:  Evaluates the left node, right node and the result of the operation 
+\end{itemize}\subsection{NumberNode}
+ Represents a number \subsubsection*{Attributes}
+The type {\it NumberNode} has the following attributes:
+
+\begin{itemize}
+\item {\bf value}:  The value of the number 
+\end{itemize}
+\subsubsection*{Methods}
+The type {\it NumberNode} has the following methods:
+
+\begin{itemize}\item {\bf constructor(n)}:  Create the node 
+\item {\bf evaluate()}:  Returns the value of the number 
+\end{itemize}\subsection{Parser}
+ Represents the parser which will create the abstract syntax tree \subsubsection*{Attributes}
+The type {\it Parser} has the following attributes:
+
+\begin{itemize}
+\item {\bf tokens}:  The list of tokens we receive from the lexer 
+\end{itemize}
+\subsubsection*{Methods}
+The type {\it Parser} has the following methods:
+
+\begin{itemize}\item {\bf constructor(t)}:  Create the parser 
+\item {\bf move\_cursor()}:  Gets the next token 
+\item {\bf parse()}:  Start parsing the token stream 
+\item {\bf parse\_expression()}:  Parses an expression 
+\item {\bf parse\_term()}:  Parses a term 
+\item {\bf parse\_factor()}:  Parses a factor 
+\item {\bf parse\_binary\_operation(operators, func)}:  Parses a binary operation based on the operators and function it receives 
+\end{itemize}\section{Utilities}\subsection{TokenType}
+ Enum for representing token types \subsubsection*{Attributes}
+The type {\it TokenType} has the following attributes:
+
+\begin{itemize}
+\item {\bf SPACE}:  A space char 
+\item {\bf NUMBER}:  A number 
+\item {\bf ADDITION}:  The symbol + 
+\item {\bf SUBTRACTION}:  The symbol - 
+\item {\bf DIVISION}:  The symbol / 
+\item {\bf MULTIPLICATION}:  The symbol * 
+\end{itemize}
+\end{document}

@@ -1,0 +1,5 @@
+define type Test
+	extend "text"
+	define method constructor()
+	stop
+stop

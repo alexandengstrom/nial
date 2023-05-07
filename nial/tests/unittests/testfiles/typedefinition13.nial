@@ -1,0 +1,7 @@
+define type Child
+	extend Base
+	define method constructor()
+	stop
+stop
+
+x = create Child()

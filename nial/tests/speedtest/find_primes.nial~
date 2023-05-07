@@ -1,0 +1,16 @@
+define function is_prime(num)
+	count number from 2 to num-1
+		if num % number == 0 then return False stop
+	stop
+	return True
+stop
+
+define function find_primes(limit)
+	primes = []
+	count number from 2 to limit
+		if call is_prime(number) then call primes.append(number) stop
+	stop
+	return primes
+stop
+
+display call find_primes(1000)

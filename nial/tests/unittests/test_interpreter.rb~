@@ -1,0 +1,624 @@
+require "test/unit"
+require "./datatypes/number"
+require "./datatypes/text"
+require "./datatypes/boolean"
+require "./datatypes/function"
+require_relative "../scope/scope"
+require "./interpreter/interpreter"
+require "./lexer/lexer"
+require "./parser/parser"
+require_relative "../position/position"
+
+class Test_Interpreter < Test::Unit::TestCase
+  def evaluate_statement(string)
+    lexer = Lexer.new
+    parser = Parser.new(lexer.tokenize(string))
+    result = parser.parse_statement
+    scope = Scope.new("global", nil, Position.new(1,1,1))
+    result = Interpreter.evaluate(result, scope)
+    return result
+  end
+
+  
+  def test_arithmetic_expression
+    result = evaluate_statement("1+1")  
+    assert_equal(Number, result.class)
+    assert_equal(2, result.value)
+
+    result = evaluate_statement("1+2*5")  
+    assert_equal(Number, result.class)
+    assert_equal(11, result.value)
+
+    result = evaluate_statement("(1+2)*5")  
+    assert_equal(Number, result.class)
+    assert_equal(15, result.value)
+
+    result = evaluate_statement("(1-2)*5")  
+    assert_equal(Number, result.class)
+    assert_equal(-5, result.value)
+
+    result = evaluate_statement("(5*5/5)")  
+    assert_equal(Number, result.class)
+    assert_equal(5, result.value)
+
+    result = evaluate_statement("2+2+2+2+2")  
+    assert_equal(Number, result.class)
+    assert_equal(10, result.value)
+
+    result = evaluate_statement("-1*2+2+2+2+2")  
+    assert_equal(Number, result.class)
+    assert_equal(6, result.value)
+
+    result = evaluate_statement("-1*(2+2+2+2+2)")  
+    assert_equal(Number, result.class)
+    assert_equal(-10, result.value)
+
+    result = evaluate_statement("-1*-1")  
+    assert_equal(Number, result.class)
+    assert_equal(1, result.value)
+
+    result = evaluate_statement("3%2*5")  
+    assert_equal(Number, result.class)
+    assert_equal(5, result.value)
+
+    result = evaluate_statement("0-15+21")  
+    assert_equal(Number, result.class)
+    assert_equal(6, result.value)
+
+    result = evaluate_statement("10%2*2")  
+    assert_equal(Number, result.class)
+    assert_equal(0, result.value)
+
+    result = evaluate_statement("8/4/2")  
+    assert_equal(Number, result.class)
+    assert_equal(1, result.value)
+
+    result = evaluate_statement('"hello" + " world"')  
+    assert_equal(Text, result.class)
+    assert_equal("hello world", result.value)
+
+    result = evaluate_statement('"a" + "longer" + "string"')  
+    assert_equal(Text, result.class)
+    assert_equal("alongerstring", result.value)
+
+    result = evaluate_statement('"hello" * 3')  
+    assert_equal(Text, result.class)
+    assert_equal("hellohellohello", result.value)
+
+    result = evaluate_statement('2 * "hello"')  
+    assert_equal(Text, result.class)
+    assert_equal("hellohello", result.value)
+
+    result = evaluate_statement('-1 * "hello"')  
+    assert_equal(InvalidOperator, result.class)
+  end
+
+  def test_greater_than
+    result = evaluate_statement("2>1")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement("2>2")  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement("2>3")  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement("2>-3")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement("-2>1")  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement("1000000000>100000000")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+  end
+
+  def test_less_than
+    result = evaluate_statement("2<1")  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement("2<2")  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement("2<3")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement("2<-3")  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement("-2<1")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement("-2300000000<-100000000")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+  end
+
+  def test_equals
+    result = evaluate_statement("2==2")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+    
+    result = evaluate_statement("-2==-2")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement("2==-2")  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement("-2==2")  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement("1000000000==1000000000")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement('"" == 0')  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement('"" == "0"')  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement('"text" == 0')  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement('"text" == -1')  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement('True == False')  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement('False == True')  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement('True == True')  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement('False == False')  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+  end
+
+  def test_not_equals
+    result = evaluate_statement("2!=2")  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+    
+    result = evaluate_statement("-2!=-2")  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement("2!=-2")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement("-2!=2")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement("1000000000!=1000000000")  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement('"" != 0')  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement('"" != "0"')  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement('"text" != 0')  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement('"text" != -1')  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement('True != False')  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement('False != True')  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement('True != True')  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement('False != False')  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+  end
+
+  def test_equals_or_greater_than
+    result = evaluate_statement("10 >= 10")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement("10 >= 11")  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement("11 >= 10")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement("-10 >= 10")  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement("-10 >= -10")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement("1 >= -10")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement("-1000 >= -200")  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+  end
+
+  def equals_or_less_than
+    result = evaluate_statement("10 <= 10")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement("10 <= 11")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement("11 <= 10")  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement("-10 <= 10")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement("-10 <= -10")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement("1 <= -10")  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement("-1000 <= -200")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+  end
+
+  def test_and
+    result = evaluate_statement("2>1 and -200<0")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement("2>1 and -200<0 and 10!=9 and 2==2")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement("2>1 and -200<0 and 10!=9 and 2==1")  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement("True and True")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement("False and False")  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement("True and False")  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement("False and True")  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+  end
+
+  def test_or
+    result = evaluate_statement("2>1 or -200<0")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement("2>1 or -200<0 or 10!=9 or 2==2")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement("2>1 or -200<0 or 10!=9 or 2==1")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement("2<1 or -200>0 or 10==9 or 2==1")  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement("True or True")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement("False or False")  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement("True or False")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement("False or True")  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+  end
+
+  def test_number_methods
+    result = evaluate_statement("call 9.square_root()")  
+    assert_equal(Number, result.class)
+    assert_equal(3, result.value)
+
+    result = evaluate_statement("call 100.square_root()")  
+    assert_equal(Number, result.class)
+    assert_equal(10, result.value)
+
+    result = evaluate_statement("call 0.square_root()")  
+    assert_equal(Number, result.class)
+    assert_equal(0, result.value)
+
+    result = evaluate_statement("call -1.square_root()")  
+    assert_equal(InvalidOperator, result.class)
+
+    result = evaluate_statement("call 3.factorial()")  
+    assert_equal(Number, result.class)
+    assert_equal(6, result.value)
+
+    result = evaluate_statement("call 5.factorial()")  
+    assert_equal(Number, result.class)
+    assert_equal(120, result.value)
+
+    result = evaluate_statement("call 0.factorial()")  
+    assert_equal(Number, result.class)
+    assert_equal(1, result.value)
+
+    result = evaluate_statement("call -3.factorial()")  
+    assert_equal(InvalidOperator, result.class)
+
+    result = evaluate_statement("call 3.1415.round(2)")  
+    assert_equal(Number, result.class)
+    assert_equal(3.14, result.value)
+
+    result = evaluate_statement("call 3.1415.round(0)")  
+    assert_equal(Number, result.class)
+    assert_equal(3, result.value)
+
+    result = evaluate_statement("call 3.1415.round(-1)")  
+    assert_equal(Number, result.class)
+    assert_equal(0, result.value)
+
+    result = evaluate_statement("call 3.absolute_value()")  
+    assert_equal(Number, result.class)
+    assert_equal(3, result.value)
+
+    result = evaluate_statement("call -3.absolute_value()")  
+    assert_equal(Number, result.class)
+    assert_equal(3, result.value)
+  end
+
+  def test_text_methods
+    result = evaluate_statement('call "hello world".length()')  
+    assert_equal(Number, result.class)
+    assert_equal(11, result.value)
+
+    result = evaluate_statement('call "".length()')  
+    assert_equal(Number, result.class)
+    assert_equal(0, result.value)
+
+    result = evaluate_statement('call "123".length()')  
+    assert_equal(Number, result.class)
+    assert_equal(3, result.value)
+
+    result = evaluate_statement('call "123".convert_to_number()')  
+    assert_equal(Number, result.class)
+    assert_equal(123, result.value)
+
+    result = evaluate_statement('call "0".convert_to_number()')  
+    assert_equal(Number, result.class)
+    assert_equal(0, result.value)
+
+    result = evaluate_statement('call "1.1".convert_to_number()')  
+    assert_equal(Number, result.class)
+    assert_equal(1.1, result.value)
+
+    result = evaluate_statement('call "hello world".upper()')  
+    assert_equal(Text, result.class)
+    assert_equal("HELLO WORLD", result.value)
+
+    result = evaluate_statement('call "".upper()')  
+    assert_equal(Text, result.class)
+    assert_equal("", result.value)
+
+    result = evaluate_statement('call "123".upper()')  
+    assert_equal(Text, result.class)
+    assert_equal("123", result.value)
+
+    result = evaluate_statement('call "HELLO WORLD".lower()')  
+    assert_equal(Text, result.class)
+    assert_equal("hello world", result.value)
+
+    result = evaluate_statement('call "".lower()')  
+    assert_equal(Text, result.class)
+    assert_equal("", result.value)
+
+    result = evaluate_statement('call "123".lower()')  
+    assert_equal(Text, result.class)
+    assert_equal("123", result.value)
+
+    result = evaluate_statement('call "hello world".strip()')  
+    assert_equal(Text, result.class)
+    assert_equal("hello world", result.value)
+
+    result = evaluate_statement('call "     hello world".strip()')  
+    assert_equal(Text, result.class)
+    assert_equal("hello world", result.value)
+
+    result = evaluate_statement('call "hello world      ".strip()')  
+    assert_equal(Text, result.class)
+    assert_equal("hello world", result.value)
+
+    result = evaluate_statement('call "     hello world  ".strip()')  
+    assert_equal(Text, result.class)
+    assert_equal("hello world", result.value)
+
+    result = evaluate_statement('call "test".left_justify(10)')  
+    assert_equal(Text, result.class)
+    assert_equal("test      ", result.value)
+
+    result = evaluate_statement('call "test".right_justify(10)')  
+    assert_equal(Text, result.class)
+    assert_equal("      test", result.value)
+
+    result = evaluate_statement('call "test".right_justify("1")')  
+    assert_equal(InvalidDatatype, result.class)
+
+    result = evaluate_statement('call "test".right_justify(True)')  
+    assert_equal(InvalidDatatype, result.class)
+
+    result = evaluate_statement('call "test".right_justify(Null)')  
+    assert_equal(InvalidDatatype, result.class)
+
+    result = evaluate_statement('call "test".right_justify([1, 2, 3])')  
+    assert_equal(InvalidDatatype, result.class)
+
+    result = evaluate_statement('call "hello world".sub("hello", "hi")')  
+    assert_equal(Text, result.class)
+    assert_equal("hi world", result.value)
+
+    result = evaluate_statement('call "hello world".sub(2, "hi")')  
+    assert_equal(InvalidDatatype, result.class)
+
+    result = evaluate_statement('call "hello world".sub("hello", [1,2,3])')  
+    assert_equal(InvalidDatatype, result.class)
+
+    result = evaluate_statement('call "this is a sentence
+over multiple
+lines".split_lines()')  
+    assert_equal(List, result.class)
+    assert_equal(3, result.value.length)
+
+    result = evaluate_statement('call "a sentence on one line".split_lines()')  
+    assert_equal(List, result.class)
+    assert_equal(1, result.value.length)
+
+    result = evaluate_statement('call "a sentence on one line".split_words()')  
+    assert_equal(List, result.class)
+    assert_equal(5, result.value.length)
+
+    result = evaluate_statement('call "word".split_lines()')  
+    assert_equal(List, result.class)
+    assert_equal(1, result.value.length)
+
+    result = evaluate_statement('call "an ok sentence ok with ok many ok".split("ok")')  
+    assert_equal(List, result.class)
+    assert_equal(4, result.value.length)
+
+    result = evaluate_statement('call "an ok sentence ok with ok many ok".split(1)')  
+    assert_equal(InvalidDatatype, result.class)
+  end
+
+  def test_list_methods
+    result = evaluate_statement('call [1, 2, 3, 4].pop()')  
+    assert_equal(Number, result.class)
+    assert_equal(4, result.value)
+
+    result = evaluate_statement('call [1, 2, 3, "test"].pop()')  
+    assert_equal(Text, result.class)
+    assert_equal("test", result.value)
+
+    result = evaluate_statement('call [].pop()')  
+    assert_equal(Null, result.class)
+
+    result = evaluate_statement('call [1, 2, 3, 4].has_value(4)')  
+    assert_equal(Boolean, result.class)
+    assert_equal(true, result.value)
+
+    result = evaluate_statement('call [1, 2, 3, 4].has_value("4")')  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement('call [1, 2, 3, 4].has_value(0)')  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement('call [1, 2, 3, 4].has_value(-1)')  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement('call [1, 2, 3, 4].has_value(1.1)')  
+    assert_equal(Boolean, result.class)
+    assert_equal(false, result.value)
+
+    result = evaluate_statement('call [1, 2, 3, 4].first()')  
+    assert_equal(Number, result.class)
+    assert_equal(1, result.value)
+
+    result = evaluate_statement('call [1, 2, 3, 4].last()')  
+    assert_equal(Number, result.class)
+    assert_equal(4, result.value)
+
+    result = evaluate_statement('call [1, 2, 3, 4].join(" ")')  
+    assert_equal(Text, result.class)
+    assert_equal("1 2 3 4", result.value)
+
+    result = evaluate_statement('call [1, 2, 3, 4].join("ok")')  
+    assert_equal(Text, result.class)
+    assert_equal("1ok2ok3ok4", result.value)
+
+    result = evaluate_statement('call [1].join("ok")')  
+    assert_equal(Text, result.class)
+    assert_equal("1", result.value)
+
+    result = evaluate_statement('call [].join("ok")')  
+    assert_equal(Text, result.class)
+    assert_equal("", result.value)
+  end
+
+  def test_exceptions
+    result = evaluate_statement("2/0")
+    assert_equal(DivisionByZero, result.class)
+
+    result = evaluate_statement("2/(2-2)")
+    assert_equal(DivisionByZero, result.class)
+
+    result = evaluate_statement("x + 2")
+    assert_equal(VariableNotDefined, result.class)
+
+    result = evaluate_statement("True and Null")
+    assert_equal(ConversionError, result.class)
+  end
+
+end

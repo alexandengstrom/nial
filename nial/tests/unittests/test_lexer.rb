@@ -1,0 +1,758 @@
+# coding: utf-8
+require "test/unit"
+require_relative "../../source/lexer/lexer"
+
+class Test_Lexer < Test::Unit::TestCase
+  def test_string_tokens
+    lexer = Lexer.new
+
+    # Test a single word
+    result = lexer.tokenize('"test"')
+    assert_equal(1, result.length)
+    assert_equal(:TEXT, result[0].type)
+    assert_equal('"test"', result[0].value)
+    assert_true(result[0].value.is_a?(String))
+
+    # Test multiple words
+    result = lexer.tokenize('"first" "and" "second" "test"')
+    assert_equal(4, result.length)
+    assert_equal(:TEXT, result[0].type)
+    assert_equal(:TEXT, result[1].type)
+    assert_equal(:TEXT, result[2].type)
+    assert_equal(:TEXT, result[3].type)
+
+    # Test multiple words that should be only one token
+    result = lexer.tokenize('"first and second test"')
+    assert_equal(1, result.length)
+    assert_equal(:TEXT, result[0].type)
+
+    # Test that digits inside "" are catched as text-tokens
+    result = lexer.tokenize('"123456789"')
+    assert_equal(1, result.length)
+    assert_equal(:TEXT, result[0].type)
+  end
+
+  def test_number_tokens
+    lexer = Lexer.new
+
+    # Test a single integer
+    result = lexer.tokenize('1')
+    assert_equal(1, result.length)
+    assert_equal(:INT, result[0].type)
+    assert_true(result[0].value.is_a?(Integer))
+
+    # Test multiple integers
+    result = lexer.tokenize('1 2 3 4 5')
+    assert_equal(5, result.length)
+    assert_equal(:INT, result[0].type)
+    assert_equal(:INT, result[1].type)
+    assert_equal(:INT, result[2].type)
+    assert_equal(:INT, result[3].type)
+    assert_equal(:INT, result[4].type)
+
+    # Test a single float
+    result = lexer.tokenize('1.9')
+    assert_equal(1, result.length)
+    assert_equal(:FLOAT, result[0].type)
+    assert_true(result[0].value.is_a?(Float))
+
+    # Test multiple floats
+    result = lexer.tokenize('1.0 2.23322 3.92 4.34324 5.5624')
+    assert_equal(5, result.length)
+    assert_equal(:FLOAT, result[0].type)
+    assert_equal(:FLOAT, result[1].type)
+    assert_equal(:FLOAT, result[2].type)
+    assert_equal(:FLOAT, result[3].type)
+    assert_equal(:FLOAT, result[4].type)
+
+    # Test combining integers and floats
+    result = lexer.tokenize('1 2.23322 3.924')
+    assert_equal(3, result.length)
+    assert_equal(:INT, result[0].type)
+    assert_equal(:FLOAT, result[1].type)
+    assert_equal(:FLOAT, result[2].type)
+  end
+
+  def test_booleans
+    lexer = Lexer.new
+    result = lexer.tokenize('True')
+    assert_equal(1, result.length)
+    assert_equal(:BOOLEAN, result[0].type)
+    assert_equal(true, result[0].value)
+
+    result = lexer.tokenize('False')
+    assert_equal(1, result.length)
+    assert_equal(:BOOLEAN, result[0].type)
+    assert_equal(false, result[0].value)
+  end
+
+  def test_null
+    lexer = Lexer.new
+    result = lexer.tokenize('Null')
+    assert_equal(1, result.length)
+    assert_equal(:NULL, result[0].type)
+    assert_equal(nil, result[0].value)
+  end
+
+  def test_arithmetic_operator_tokens
+    lexer = Lexer.new
+
+    # Test addition token
+    result = lexer.tokenize('+')
+    assert_equal(1, result.length)
+    assert_equal(:ADDITION, result[0].type)
+
+    # Test subtraction token
+    result = lexer.tokenize('-')
+    assert_equal(1, result.length)
+    assert_equal(:SUBTRACTION, result[0].type)
+
+    # Test addition token
+    result = lexer.tokenize('*')
+    assert_equal(1, result.length)
+    assert_equal(:MULTIPLICATION, result[0].type)
+
+    # Test subtraction token
+    result = lexer.tokenize('/')
+    assert_equal(1, result.length)
+    assert_equal(:DIVISION, result[0].type)
+
+    # Test subtraction token
+    result = lexer.tokenize('%')
+    assert_equal(1, result.length)
+    assert_equal(:MODULO, result[0].type)
+  end
+
+  def test_comparison_operator_tokens
+    lexer = Lexer.new
+
+    # Test addition token
+    result = lexer.tokenize('>')
+    assert_equal(1, result.length)
+    assert_equal(:GREATER_THAN, result[0].type)
+
+    # Test subtraction token
+    result = lexer.tokenize('<')
+    assert_equal(1, result.length)
+    assert_equal(:LESS_THAN, result[0].type)
+
+    # Test addition token
+    result = lexer.tokenize('>=')
+    assert_equal(1, result.length)
+    assert_equal(:EQUALS_OR_GREATER_THAN, result[0].type)
+
+    # Test subtraction token
+    result = lexer.tokenize('<=')
+    assert_equal(1, result.length)
+    assert_equal(:EQUALS_OR_LESS_THAN, result[0].type)
+
+    # Test subtraction token
+    result = lexer.tokenize('==')
+    assert_equal(1, result.length)
+    assert_equal(:EQUALS, result[0].type)
+
+    # Test subtraction token
+    result = lexer.tokenize('!=')
+    assert_equal(1, result.length)
+    assert_equal(:NOT_EQUALS, result[0].type)
+  end
+
+  def test_unary_operator
+    lexer = Lexer.new
+    result = lexer.tokenize('-2')
+    assert_equal(2, result.length)
+    assert_equal(:SUBTRACTION, result[0].type)
+    assert_equal(:INT, result[1].type)
+    
+  end
+
+  def test_arithmetic_expression
+    lexer = Lexer.new
+
+    # Test addition
+    result = lexer.tokenize('1 + 2')
+    assert_equal(3, result.length)
+    assert_equal(:INT, result[0].type)
+    assert_equal(:ADDITION, result[1].type)
+    assert_equal(:INT, result[2].type)
+
+    result = lexer.tokenize('1.3 + 2')
+    assert_equal(3, result.length)
+    assert_equal(:FLOAT, result[0].type)
+    assert_equal(:ADDITION, result[1].type)
+    assert_equal(:INT, result[2].type)
+
+    # Test subtraction
+    result = lexer.tokenize('1 - 2')
+    assert_equal(3, result.length)
+    assert_equal(:INT, result[0].type)
+    assert_equal(:SUBTRACTION, result[1].type)
+    assert_equal(:INT, result[2].type)
+
+    result = lexer.tokenize('1 - 2.00')
+    assert_equal(3, result.length)
+    assert_equal(:INT, result[0].type)
+    assert_equal(:SUBTRACTION, result[1].type)
+    assert_equal(:FLOAT, result[2].type)
+
+    # Test longer expression
+    result = lexer.tokenize('1 - 2 / 2 * 55.55')
+    assert_equal(7, result.length)
+    assert_equal(:INT, result[0].type)
+    assert_equal(:SUBTRACTION, result[1].type)
+    assert_equal(:INT, result[2].type)
+    assert_equal(:DIVISION, result[3].type)
+    assert_equal(:INT, result[4].type)
+    assert_equal(:MULTIPLICATION, result[5].type)
+    assert_equal(:FLOAT, result[6].type)
+  end
+
+  def test_comparison_expression
+    lexer = Lexer.new
+
+    # Test greather than
+    result = lexer.tokenize('1 > 2')
+    assert_equal(3, result.length)
+    assert_equal(:INT, result[0].type)
+    assert_equal(:GREATER_THAN, result[1].type)
+    assert_equal(:INT, result[2].type)
+
+    # Test greather than
+    result = lexer.tokenize('1.99 != 2')
+    assert_equal(3, result.length)
+    assert_equal(:FLOAT, result[0].type)
+    assert_equal(:NOT_EQUALS, result[1].type)
+    assert_equal(:INT, result[2].type)
+  end
+
+  def test_comments
+    lexer = Lexer.new
+
+    # Token should not be in the list
+    result = lexer.tokenize('#comment')
+    assert_equal(0, result.length)
+
+    # Only the first integer should be in the list
+    result = lexer.tokenize('1 #comment 3 2 3 5 2')
+    assert_equal(1, result.length) 
+  end
+
+  def test_function_definition
+    lexer = Lexer.new
+
+    # Function without parameters
+    result = lexer.tokenize('define function test()')
+    assert_equal(4, result.length)
+    assert_equal(:DEFINE_FUNCTION, result[0].type)
+    assert_equal(:IDENTIFIER, result[1].type)
+    assert_equal(:LEFT_PAREN, result[2].type)
+    assert_equal(:RIGHT_PAREN, result[3].type)
+    
+    # Function with one parameter
+    result = lexer.tokenize('define function test(parameter)')
+    assert_equal(5, result.length)
+    assert_equal(:DEFINE_FUNCTION, result[0].type)
+    assert_equal(:IDENTIFIER, result[1].type)
+    assert_equal(:LEFT_PAREN, result[2].type)
+    assert_equal(:IDENTIFIER, result[3].type)
+    assert_equal(:RIGHT_PAREN, result[4].type)
+
+    # Function with one copied parameter
+    result = lexer.tokenize('define function test(copy parameter)')
+    assert_equal(6, result.length)
+    assert_equal(:DEFINE_FUNCTION, result[0].type)
+    assert_equal(:IDENTIFIER, result[1].type)
+    assert_equal(:LEFT_PAREN, result[2].type)
+    assert_equal(:COPY, result[3].type)
+    assert_equal(:IDENTIFIER, result[4].type)
+    assert_equal(:RIGHT_PAREN, result[5].type)
+
+    # Function with multiple parameters
+    result = lexer.tokenize('define function test(parameter1, parameter2, parameter3)')
+    assert_equal(9, result.length)
+    assert_equal(:DEFINE_FUNCTION, result[0].type)
+    assert_equal(:IDENTIFIER, result[1].type)
+    assert_equal(:LEFT_PAREN, result[2].type)
+    assert_equal(:IDENTIFIER, result[3].type)
+    assert_equal(:COMMA, result[4].type)
+    assert_equal(:IDENTIFIER, result[5].type)
+    assert_equal(:COMMA, result[6].type)
+    assert_equal(:IDENTIFIER, result[7].type)
+    assert_equal(:RIGHT_PAREN, result[8].type)
+  end
+
+  def test_function_call
+    lexer = Lexer.new
+
+    # Call function without parameters
+    result = lexer.tokenize('call functionname()')
+    assert_equal(4, result.length)
+    assert_equal(:CALL, result[0].type)
+    assert_equal(:IDENTIFIER, result[1].type)
+    assert_equal(:LEFT_PAREN, result[2].type)
+    assert_equal(:RIGHT_PAREN, result[3].type)
+
+    # Call function with one integer
+    result = lexer.tokenize('call functionname(5)')
+    assert_equal(5, result.length)
+    assert_equal(:CALL, result[0].type)
+    assert_equal(:IDENTIFIER, result[1].type)
+    assert_equal(:LEFT_PAREN, result[2].type)
+    assert_equal(:INT, result[3].type)
+    assert_equal(:RIGHT_PAREN, result[4].type)
+
+    # Call function with one string as parameter
+    result = lexer.tokenize('call functionname("string")')
+    assert_equal(5, result.length)
+    assert_equal(:CALL, result[0].type)
+    assert_equal(:IDENTIFIER, result[1].type)
+    assert_equal(:LEFT_PAREN, result[2].type)
+    assert_equal(:TEXT, result[3].type)
+    assert_equal(:RIGHT_PAREN, result[4].type)
+  end
+
+  def test_variable_assignment
+    lexer = Lexer.new
+
+    # Assign an integer to x
+    result = lexer.tokenize('x = 10')
+    assert_equal(3, result.length)
+    assert_equal(:IDENTIFIER, result[0].type)
+    assert_equal(:ASSIGNMENT, result[1].type)
+    assert_equal(:INT, result[2].type)
+
+    # Assign a string to a longer variable name
+    result = lexer.tokenize('longervariablename = "text"')
+    assert_equal(3, result.length)
+    assert_equal(:IDENTIFIER, result[0].type)
+    assert_equal(:ASSIGNMENT, result[1].type)
+    assert_equal(:TEXT, result[2].type)
+
+  end
+
+  def test_display
+    lexer = Lexer.new
+
+    # Display number
+    result = lexer.tokenize('display 10')
+    assert_equal(2, result.length)
+    assert_equal(:DISPLAY, result[0].type)
+    assert_equal(:INT, result[1].type)
+
+    # Display text
+    result = lexer.tokenize('display "hello world"')
+    assert_equal(2, result.length)
+    assert_equal(:DISPLAY, result[0].type)
+    assert_equal(:TEXT, result[1].type)
+
+    # Display expression
+    result = lexer.tokenize('display 10+10')
+    assert_equal(4, result.length)
+    assert_equal(:DISPLAY, result[0].type)
+    assert_equal(:INT, result[1].type)
+    assert_equal(:ADDITION, result[2].type)
+    assert_equal(:INT, result[3].type)
+  end
+
+  def test_user_input
+    lexer = Lexer.new
+
+    # Let user assign x
+    result = lexer.tokenize('let user assign x')
+    assert_equal(2, result.length)
+    assert_equal(:LET_USER_ASSIGN, result[0].type)
+    assert_equal(:IDENTIFIER, result[1].type)
+  end
+
+  def test_return
+    lexer = Lexer.new
+
+    result = lexer.tokenize('return')
+    assert_equal(1, result.length)
+    assert_equal(:RETURN, result[0].type)
+
+    result = lexer.tokenize('return 2')
+    assert_equal(2, result.length)
+    assert_equal(:RETURN, result[0].type)
+    assert_equal(:INT, result[1].type)
+
+    result = lexer.tokenize('return True')
+    assert_equal(2, result.length)
+    assert_equal(:RETURN, result[0].type)
+    assert_equal(:BOOLEAN, result[1].type)
+
+    result = lexer.tokenize('return call function()')
+    assert_equal(5, result.length)
+    assert_equal(:RETURN, result[0].type)
+    assert_equal(:CALL, result[1].type)
+    assert_equal(:IDENTIFIER, result[2].type)
+    assert_equal(:LEFT_PAREN, result[3].type)
+    assert_equal(:RIGHT_PAREN, result[4].type)
+  end
+
+  def test_count_loop
+    lexer = Lexer.new
+
+    result = lexer.tokenize('count x from 1 to 10')
+    assert_equal(6, result.length)
+    assert_equal(:COUNT, result[0].type)
+    assert_equal(:IDENTIFIER, result[1].type)
+    assert_equal(:FROM, result[2].type)
+    assert_equal(:INT, result[3].type)
+    assert_equal(:TO, result[4].type)
+    assert_equal(:INT, result[5].type)
+
+    result = lexer.tokenize('count number from -1 to 10+10 display number stop')
+    assert_equal(12, result.length)
+    assert_equal(:COUNT, result[0].type)
+    assert_equal(:IDENTIFIER, result[1].type)
+    assert_equal(:FROM, result[2].type)
+    assert_equal(:SUBTRACTION, result[3].type)
+    assert_equal(:INT, result[4].type)
+    assert_equal(:TO, result[5].type)
+    assert_equal(:INT, result[6].type)
+    assert_equal(:ADDITION, result[7].type)
+    assert_equal(:INT, result[8].type)
+    assert_equal(:DISPLAY, result[9].type)
+    assert_equal(:IDENTIFIER, result[10].type)
+    assert_equal(:STOP, result[11].type)
+
+    result = lexer.tokenize('count x from y to z')
+    assert_equal(6, result.length)
+    assert_equal(:COUNT, result[0].type)
+    assert_equal(:IDENTIFIER, result[1].type)
+    assert_equal(:FROM, result[2].type)
+    assert_equal(:IDENTIFIER, result[3].type)
+    assert_equal(:TO, result[4].type)
+    assert_equal(:IDENTIFIER, result[5].type)
+  end
+
+  def test_lists
+    lexer = Lexer.new
+
+    result = lexer.tokenize('[]')
+    assert_equal(2, result.length)
+    assert_equal(:LEFT_SQUARE, result[0].type)
+    assert_equal(:RIGHT_SQUARE, result[1].type)
+
+    result = lexer.tokenize('[1]')
+    assert_equal(3, result.length)
+    assert_equal(:LEFT_SQUARE, result[0].type)
+    assert_equal(:INT, result[1].type)
+    assert_equal(:RIGHT_SQUARE, result[2].type)
+
+    result = lexer.tokenize('[1.2]')
+    assert_equal(3, result.length)
+    assert_equal(:LEFT_SQUARE, result[0].type)
+    assert_equal(:FLOAT, result[1].type)
+    assert_equal(:RIGHT_SQUARE, result[2].type)
+
+    result = lexer.tokenize('[1.2, 2]')
+    assert_equal(5, result.length)
+    assert_equal(:LEFT_SQUARE, result[0].type)
+    assert_equal(:FLOAT, result[1].type)
+    assert_equal(:COMMA, result[2].type)
+    assert_equal(:INT, result[3].type)
+    assert_equal(:RIGHT_SQUARE, result[4].type)
+
+    result = lexer.tokenize('[[]]')
+    assert_equal(4, result.length)
+    assert_equal(:LEFT_SQUARE, result[0].type)
+    assert_equal(:LEFT_SQUARE, result[1].type)
+    assert_equal(:RIGHT_SQUARE, result[2].type)
+    assert_equal(:RIGHT_SQUARE, result[3].type)
+
+    result = lexer.tokenize('[1.2, 2, "hello", identifier, -3]')
+    assert_equal(12, result.length)
+    assert_equal(:LEFT_SQUARE, result[0].type)
+    assert_equal(:FLOAT, result[1].type)
+    assert_equal(:COMMA, result[2].type)
+    assert_equal(:INT, result[3].type)
+    assert_equal(:COMMA, result[4].type)
+    assert_equal(:TEXT, result[5].type)
+    assert_equal(:COMMA, result[6].type)
+    assert_equal(:IDENTIFIER, result[7].type)
+    assert_equal(:COMMA, result[8].type)
+    assert_equal(:SUBTRACTION, result[9].type)
+    assert_equal(:INT, result[10].type) 
+    assert_equal(:RIGHT_SQUARE, result[11].type)
+
+    result = lexer.tokenize('var[1]')
+    assert_equal(4, result.length)
+    assert_equal(:IDENTIFIER, result[0].type)
+    assert_equal(:LEFT_SQUARE, result[1].type)
+    assert_equal(:INT, result[2].type)
+    assert_equal(:RIGHT_SQUARE, result[3].type)
+
+    result = lexer.tokenize('var[1] = 2')
+    assert_equal(6, result.length)
+    assert_equal(:IDENTIFIER, result[0].type)
+    assert_equal(:LEFT_SQUARE, result[1].type)
+    assert_equal(:INT, result[2].type)
+    assert_equal(:RIGHT_SQUARE, result[3].type)
+    assert_equal(:ASSIGNMENT, result[4].type)
+    assert_equal(:INT, result[5].type)
+  end
+
+  def test_while_loop
+    lexer = Lexer.new
+
+    result = lexer.tokenize('while x x = x+1 stop')
+    assert_equal(8, result.length)
+    assert_equal(:WHILE, result[0].type)
+    assert_equal(:IDENTIFIER, result[1].type)
+    assert_equal(:IDENTIFIER, result[2].type)
+    assert_equal(:ASSIGNMENT, result[3].type)
+    assert_equal(:IDENTIFIER, result[4].type)
+    assert_equal(:ADDITION, result[5].type)
+    assert_equal(:INT, result[6].type)
+    assert_equal(:STOP, result[7].type)
+  end
+
+  def test_for_loop
+    lexer = Lexer.new
+
+    result = lexer.tokenize('for every x in y display x stop')
+    assert_equal(7, result.length)
+    assert_equal(:FOR_EVERY, result[0].type)
+    assert_equal(:IDENTIFIER, result[1].type)
+    assert_equal(:IN, result[2].type)
+    assert_equal(:IDENTIFIER, result[3].type)
+    assert_equal(:DISPLAY, result[4].type)
+    assert_equal(:IDENTIFIER, result[5].type)
+    assert_equal(:STOP, result[6].type)
+  end
+
+  def test_read_from_file
+    lexer = Lexer.new
+
+    result = lexer.tokenize('load "filename" into x')
+    assert_equal(4, result.length)
+    assert_equal(:LOAD, result[0].type)
+    assert_equal(:TEXT, result[1].type)
+    assert_equal(:INTO, result[2].type)
+    assert_equal(:IDENTIFIER, result[3].type)
+  end
+
+  def test_import
+    lexer = Lexer.new
+
+    result = lexer.tokenize('use "file.nial"')
+    assert_equal(2, result.length)
+    assert_equal(:USE, result[0].type)
+    assert_equal(:TEXT, result[1].type)
+
+    result = lexer.tokenize('use "file" + num + ".nial"')
+    assert_equal(6, result.length)
+    assert_equal(:USE, result[0].type)
+    assert_equal(:TEXT, result[1].type)
+    assert_equal(:ADDITION, result[2].type)
+    assert_equal(:IDENTIFIER, result[3].type)
+    assert_equal(:ADDITION, result[4].type)
+    assert_equal(:TEXT, result[5].type)   
+  end
+
+  def test_dictionary
+    lexer = Lexer.new
+
+    result = lexer.tokenize('{}')
+    assert_equal(2, result.length)
+    assert_equal(:LEFT_CURL, result[0].type)
+    assert_equal(:RIGHT_CURL, result[1].type)
+
+    result = lexer.tokenize('{"key": "value"}')
+    assert_equal(5, result.length)
+    assert_equal(:LEFT_CURL, result[0].type)
+    assert_equal(:TEXT, result[1].type)
+    assert_equal(:COLON, result[2].type)
+    assert_equal(:TEXT, result[3].type)
+    assert_equal(:RIGHT_CURL, result[4].type)
+
+    result = lexer.tokenize('{key: value}')
+    assert_equal(5, result.length)
+    assert_equal(:LEFT_CURL, result[0].type)
+    assert_equal(:IDENTIFIER, result[1].type)
+    assert_equal(:COLON, result[2].type)
+    assert_equal(:IDENTIFIER, result[3].type)
+    assert_equal(:RIGHT_CURL, result[4].type)
+
+    result = lexer.tokenize('{1: "one"}')
+    assert_equal(5, result.length)
+    assert_equal(:LEFT_CURL, result[0].type)
+    assert_equal(:INT, result[1].type)
+    assert_equal(:COLON, result[2].type)
+    assert_equal(:TEXT, result[3].type)
+    assert_equal(:RIGHT_CURL, result[4].type)
+
+    result = lexer.tokenize('{one: 1, "two": False, 3: []}')
+    assert_equal(14, result.length)
+    assert_equal(:LEFT_CURL, result[0].type)
+    assert_equal(:IDENTIFIER, result[1].type)
+    assert_equal(:COLON, result[2].type)
+    assert_equal(:INT, result[3].type)
+    assert_equal(:COMMA, result[4].type)
+    assert_equal(:TEXT, result[5].type)
+    assert_equal(:COLON, result[6].type)
+    assert_equal(:BOOLEAN, result[7].type)
+    assert_equal(:COMMA, result[8].type)
+    assert_equal(:INT, result[9].type)
+    assert_equal(:COLON, result[10].type)
+    assert_equal(:LEFT_SQUARE, result[11].type)
+    assert_equal(:RIGHT_SQUARE, result[12].type)
+    assert_equal(:RIGHT_CURL, result[13].type) 
+  end
+
+  def test_type_definition
+    lexer = Lexer.new
+
+    result = lexer.tokenize('define type Type')
+    assert_equal(2, result.length)
+    assert_equal(:DEFINE_TYPE, result[0].type)
+    assert_equal(:TYPE_IDENTIFIER, result[1].type)
+
+    result = lexer.tokenize('define type type')
+    assert_equal(2, result.length)
+    assert_equal(:DEFINE_TYPE, result[0].type)
+    assert_equal(:IDENTIFIER, result[1].type)
+
+    result = lexer.tokenize('define type Child extend Base')
+    assert_equal(4, result.length)
+    assert_equal(:DEFINE_TYPE, result[0].type)
+    assert_equal(:TYPE_IDENTIFIER, result[1].type)
+    assert_equal(:EXTEND, result[2].type)
+    assert_equal(:TYPE_IDENTIFIER, result[3].type)
+  end
+
+  def test_create_type
+    lexer = Lexer.new
+
+    result = lexer.tokenize('create Type()')
+    assert_equal(4, result.length)
+    assert_equal(:CREATE, result[0].type)
+    assert_equal(:TYPE_IDENTIFIER, result[1].type)
+    assert_equal(:LEFT_PAREN, result[2].type)
+    assert_equal(:RIGHT_PAREN, result[3].type)
+
+    result = lexer.tokenize('create Type(param)')
+    assert_equal(5, result.length)
+    assert_equal(:CREATE, result[0].type)
+    assert_equal(:TYPE_IDENTIFIER, result[1].type)
+    assert_equal(:LEFT_PAREN, result[2].type)
+    assert_equal(:IDENTIFIER, result[3].type)
+    assert_equal(:RIGHT_PAREN, result[4].type)
+  end
+
+  def test_method_definition
+    lexer = Lexer.new
+
+    result = lexer.tokenize('define method method()')
+    assert_equal(4, result.length)
+    assert_equal(:DEFINE_METHOD, result[0].type)
+    assert_equal(:IDENTIFIER, result[1].type)
+    assert_equal(:LEFT_PAREN, result[2].type)
+    assert_equal(:RIGHT_PAREN, result[3].type)
+  end
+
+  def test_utility_definition
+    lexer = Lexer.new
+
+    result = lexer.tokenize('define utility Utility')
+    assert_equal(2, result.length)
+    assert_equal(:DEFINE_UTILITY, result[0].type)
+    assert_equal(:TYPE_IDENTIFIER, result[1].type)
+
+    result = lexer.tokenize('CONSTANT = 1')
+    assert_equal(3, result.length)
+    assert_equal(:CONSTANT_IDENTIFIER, result[0].type)
+    assert_equal(:ASSIGNMENT, result[1].type)
+    assert_equal(:INT, result[2].type)
+  end
+
+  def test_try_block
+    lexer = Lexer.new
+
+    result = lexer.tokenize('try
+    x = 1/0
+catch DivisionByZero
+    display "error"
+else
+    x = 1
+stop')
+    assert_equal(21, result.length)
+    assert_equal(:TRY, result[0].type)
+    assert_equal(:NEWLINE, result[1].type)
+    assert_equal(:IDENTIFIER, result[2].type)
+    assert_equal(:ASSIGNMENT, result[3].type)
+    assert_equal(:INT, result[4].type)
+    assert_equal(:DIVISION, result[5].type)
+    assert_equal(:INT, result[6].type)
+    assert_equal(:NEWLINE, result[7].type)
+    assert_equal(:CATCH, result[8].type)
+    assert_equal(:TYPE_IDENTIFIER, result[9].type)
+    assert_equal(:NEWLINE, result[10].type)
+    assert_equal(:DISPLAY, result[11].type)
+    assert_equal(:TEXT, result[12].type)
+    assert_equal(:NEWLINE, result[13].type)
+    assert_equal(:ELSE, result[14].type)
+    assert_equal(:NEWLINE, result[15].type)
+    assert_equal(:IDENTIFIER, result[16].type)
+    assert_equal(:ASSIGNMENT, result[17].type)
+    assert_equal(:INT, result[18].type)
+    assert_equal(:NEWLINE, result[19].type)
+    assert_equal(:STOP, result[20].type)
+  end
+
+  def test_lambda
+    lexer = Lexer.new
+
+    result = lexer.tokenize('| x | x > 5 |')
+    assert_equal(7, result.length)
+    assert_equal(:PIPE, result[0].type)
+    assert_equal(:IDENTIFIER, result[1].type)
+    assert_equal(:PIPE, result[2].type)
+    assert_equal(:IDENTIFIER, result[3].type)
+    assert_equal(:GREATER_THAN, result[4].type)
+    assert_equal(:INT, result[5].type)
+    assert_equal(:PIPE, result[6].type)
+
+    result = lexer.tokenize('| x, y, z | x + y + z |')
+    assert_equal(13, result.length)
+    assert_equal(:PIPE, result[0].type)
+    assert_equal(:IDENTIFIER, result[1].type)
+    assert_equal(:COMMA, result[2].type)
+    assert_equal(:IDENTIFIER, result[3].type)
+    assert_equal(:COMMA, result[4].type)
+    assert_equal(:IDENTIFIER, result[5].type)
+    assert_equal(:PIPE, result[6].type)
+    assert_equal(:IDENTIFIER, result[7].type)
+    assert_equal(:ADDITION, result[8].type)
+    assert_equal(:IDENTIFIER, result[9].type)
+    assert_equal(:ADDITION, result[10].type)
+    assert_equal(:IDENTIFIER, result[11].type)
+    assert_equal(:PIPE, result[12].type)
+  end
+
+  def test_special_chars_in_text
+    lexer = Lexer.new
+
+    result = lexer.tokenize('"[åäöÅÄÖ123456789.!@#£¤$%&_:{()=?<>|\]"')
+    assert_equal(1, result.length)
+    assert_equal(:TEXT, result[0].type)
+
+    result = lexer.tokenize('"\n"')
+    assert_equal(1, result.length)
+    assert_equal(:TEXT, result[0].type)
+
+    result = lexer.tokenize('"escaped \" string \" "')
+    assert_equal(1, result.length)
+    assert_equal(:TEXT, result[0].type)
+
+    result = lexer.tokenize('"\"\"\"string\""')
+    assert_equal(1, result.length)
+    assert_equal(:TEXT, result[0].type)
+
+    result = lexer.tokenize('"\w*{2}"')
+    assert_equal(1, result.length)
+    assert_equal(:TEXT, result[0].type) 
+  end
+end

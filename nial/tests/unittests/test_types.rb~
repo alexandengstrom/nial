@@ -1,0 +1,232 @@
+# coding: utf-8
+require "test/unit"
+require_relative "../../source/lexer/lexer"
+require_relative "../../source/parser/parser"
+require_relative "../../source/interpreter/interpreter"
+require_relative "../../source/scope/scope"
+require_relative "../../source/position/position"
+
+class Test_Types < Test::Unit::TestCase
+  def evaluate_file(file, scope)
+    data = File.read(file)    
+    lexer = Lexer.new
+    if (result = lexer.tokenize(data, nil)).is_a?(Error) then return result end
+    parser = Parser.new(result)
+    if (result = parser.parse).is_a?(Error) then return result end
+    result = Interpreter.evaluate(result, scope)
+    return result
+  end
+
+  def evaluate_attribute_access(statement, scope)
+    lexer = Lexer.new
+    if (result = lexer.tokenize(statement, nil)).is_a?(Error) then return result end
+    parser = Parser.new(result)
+    if (result = parser.parse).is_a?(Error) then return result end
+    result = Interpreter.evaluate_attribute_access(result.statements[0], scope)
+    return result
+  end
+
+  def evaluate_method_call(statement, scope)
+    lexer = Lexer.new
+    if (result = lexer.tokenize(statement, nil)).is_a?(Error) then return result end
+    parser = Parser.new(result)
+    if (result = parser.parse).is_a?(Error) then return result end
+    result = Interpreter.evaluate_method_call(result.statements[0], scope)
+    return result
+  end
+
+  def test_single_type
+    # Test a single type without inheritance or constructor parameters
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    result = evaluate_file("./unittests/testfiles/typedefinition1.nial", scope)
+    assert_false(result.is_a?(Error))
+    
+    result = evaluate_attribute_access("object@attribute", scope)
+    assert_true(result.is_a?(Number))
+    assert_equal(3, result.value)
+
+    result = evaluate_method_call("call object.get_attribute()", scope)
+    assert_true(result.is_a?(Number))
+    assert_equal(3, result.value)
+
+    result = evaluate_method_call("call object.set_attribute(5)", scope)
+
+    result = evaluate_attribute_access("object@attribute", scope)
+    assert_true(result.is_a?(Number))
+    assert_equal(5, result.value)
+
+    result = evaluate_method_call("call object.get_attribute()", scope)
+    assert_true(result.is_a?(Number))
+    assert_equal(5, result.value)
+  end
+
+  def test_type_with_constructor
+    # Test a single type without inheritance with parameters passed to constructor
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    result = evaluate_file("./unittests/testfiles/typedefinition2.nial", scope)
+    assert_false(result.is_a?(Error))
+
+    result = evaluate_attribute_access("object@first", scope)
+    assert_true(result.is_a?(Number))
+    assert_equal(3, result.value)
+
+    result = evaluate_attribute_access("object@second", scope)
+    assert_true(result.is_a?(Number))
+    assert_equal(4, result.value)
+
+    result = evaluate_method_call("call object.get_first()", scope)
+    assert_true(result.is_a?(Number))
+    assert_equal(3, result.value)
+
+    result = evaluate_method_call("call object.set_first(5)", scope)
+    assert_true(result.is_a?(Null))
+
+    result = evaluate_attribute_access("object@first", scope)
+    assert_true(result.is_a?(Number))
+    assert_equal(5, result.value)
+
+    result = evaluate_attribute_access("object@second", scope)
+    assert_true(result.is_a?(Number))
+    assert_equal(4, result.value)
+
+    result = evaluate_method_call("call object.get_first()", scope)
+    assert_true(result.is_a?(Number))
+    assert_equal(5, result.value)
+  end
+
+  def test_call_method_within_method
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    result = evaluate_file("./unittests/testfiles/typedefinition3.nial", scope)
+    assert_false(result.is_a?(Error))
+
+    result = evaluate_attribute_access("object@first", scope)
+    assert_true(result.is_a?(Number))
+    assert_equal(3, result.value)
+
+    result = evaluate_method_call("call object.set_first(3)", scope)
+    assert_true(result.is_a?(Null))
+
+    result = evaluate_attribute_access("object@first", scope)
+    assert_true(result.is_a?(Number))
+    assert_equal(9, result.value)
+  end
+
+  def test_single_inheritence
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    result = evaluate_file("./unittests/testfiles/typedefinition4.nial", scope)
+    assert_false(result.is_a?(Error))
+
+    result = evaluate_attribute_access("object@first", scope)
+    assert_true(result.is_a?(Number))
+    assert_equal(1, result.value)
+
+    result = evaluate_attribute_access("object@second", scope)
+    assert_true(result.is_a?(Number))
+    assert_equal(2, result.value)
+
+    result = evaluate_method_call("call object.basemethod()", scope)
+    assert_true(result.is_a?(Text))
+    assert_equal("FROM BASE", result.value)
+
+    result = evaluate_method_call("call object.childmethod()", scope)
+    assert_true(result.is_a?(Text))
+    assert_equal("FROM CHILD", result.value)
+  end
+
+  def test_triple_inheritence
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    result = evaluate_file("./unittests/testfiles/typedefinition5.nial", scope)
+    assert_false(result.is_a?(Error))
+
+    result = evaluate_attribute_access("object@first", scope)
+    assert_true(result.is_a?(Number))
+    assert_equal(1, result.value)
+
+    result = evaluate_attribute_access("object@second", scope)
+    assert_true(result.is_a?(Number))
+    assert_equal(2, result.value)
+
+    result = evaluate_attribute_access("object@third", scope)
+    assert_true(result.is_a?(Number))
+    assert_equal(3, result.value)
+
+    result = evaluate_method_call("call object.basemethod()", scope)
+    assert_true(result.is_a?(Text))
+    assert_equal("OVERRIDE", result.value)
+
+    result = evaluate_method_call("call object.set_first(4)", scope)
+    assert_true(result.is_a?(Null))
+
+    result = evaluate_attribute_access("object@first", scope)
+    assert_true(result.is_a?(Number))
+    assert_equal(4, result.value)
+  end
+
+  def test_exceptions
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    result = evaluate_file("./unittests/testfiles/typedefinition6.nial", scope)
+    assert_true(result.is_a?(WrongNumberOfArguments))
+
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    result = evaluate_file("./unittests/testfiles/typedefinition7.nial", scope)
+    assert_true(result.is_a?(WrongNumberOfArguments))
+
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    result = evaluate_file("./unittests/testfiles/typedefinition8.nial", scope)
+    assert_false(result.is_a?(Error))
+    result = evaluate_method_call("call object.basemethod(3)", scope)
+    assert_true(result.is_a?(WrongNumberOfArguments))
+
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    result = evaluate_file("./unittests/testfiles/typedefinition9.nial", scope)
+    assert_false(result.is_a?(Error))
+
+    result = evaluate_method_call("call object.test_method(66)", scope)
+    assert_true(result.is_a?(Number))
+    assert_equal(66, result.value)
+
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    result = evaluate_file("./unittests/testfiles/typedefinition10.nial", scope)
+    assert_true(result.is_a?(DivisionByZero))
+
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    result = evaluate_file("./unittests/testfiles/typedefinition11.nial", scope)
+    assert_true(result.is_a?(DivisionByZero))
+
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    result = evaluate_file("./unittests/testfiles/typedefinition12.nial", scope)
+    assert_true(result.is_a?(TypeNotDefined))
+
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    result = evaluate_file("./unittests/testfiles/typedefinition13.nial", scope)
+    assert_true(result.is_a?(TypeNotDefined))
+
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    result = evaluate_file("./unittests/testfiles/typedefinition14.nial", scope)
+    assert_true(result.is_a?(UnexpectedTokenError))
+
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    result = evaluate_file("./unittests/testfiles/typedefinition15.nial", scope)
+    assert_true(result.is_a?(UnexpectedTokenError))
+
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    result = evaluate_file("./unittests/testfiles/typedefinition16.nial", scope)
+    assert_true(result.is_a?(UnexpectedTokenError)) 
+  end
+end

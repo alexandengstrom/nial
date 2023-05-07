@@ -1,0 +1,3 @@
+count x from Null to 10
+      y = 10
+stop

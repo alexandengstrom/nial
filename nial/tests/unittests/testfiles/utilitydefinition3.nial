@@ -1,0 +1,3 @@
+define utility Test
+	variable = 1
+stop

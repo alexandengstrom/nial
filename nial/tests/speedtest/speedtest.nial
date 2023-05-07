@@ -1,0 +1,58 @@
+define type Base
+	first_attribute = Null
+	define method constructor(f)
+		first_attribute = f
+	stop
+
+	define method get_first()
+		return first_attribute
+	stop
+stop
+	
+
+define type Child
+	extend Base
+	second_attribute = Null
+
+	define method constructor(f, s)
+		call parent(f)
+		second_attribute = s
+	stop
+
+	define method set_first(num)
+		first_attribute = num
+	stop
+stop
+
+define function square(num)
+	return num * num
+stop
+
+x = 1
+while x < 1000
+	new_object = create Child(5, 10)
+	call new_object.set_first(7)
+	new_value = call new_object.get_first()
+	new_list = []
+	count y from 1 to 20
+		if new_value == y then
+			dict = {"key1":1, "key2":2, "key3":3, "key4": 4, "key5":5, "key6":6, "key7":7, "key8":8}
+			dict[0] = new_object@second_attribute
+			call new_list.append(dict["key8"])
+		else
+			temp = new_object@first_attribute
+		stop
+	stop
+
+	for every item in new_list
+		temp = call square(item)
+	stop
+
+	try
+		error = 1/0
+	else
+		error = 1
+	stop
+		
+	x = x + 1
+stop

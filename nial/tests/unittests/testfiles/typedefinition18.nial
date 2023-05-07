@@ -1,0 +1,20 @@
+define type Person
+	age = 30
+	weight = 82
+	height = 186
+	friends = 0
+	define method constructor()
+		x = 2
+	stop
+
+	define method convert_to_list()
+		return [age, weight, height, friends]
+	stop
+stop
+
+
+person = create Person()
+contents = []
+for every item in person
+	call contents.append(item)
+stop

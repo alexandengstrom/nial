@@ -1,0 +1,9 @@
+define type Test
+	attribute = Null
+
+	define method constructor(num)
+		attribute = 1/num
+	stop
+stop
+
+x = create Test(0)

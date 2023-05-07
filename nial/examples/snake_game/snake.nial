@@ -1,0 +1,171 @@
+define type Snake
+	body = []
+	delta_x = 0
+	delta_y = 0
+	alive = True
+	eating = False
+	
+	define method constructor()
+		# Create the head of the snake
+		call body.append(call window.add(4, 4, BLOCK_SIZE, BLOCK_SIZE, "dark_red"))
+	stop
+
+	define method find_direction()
+		# Find the next direction of the snake
+		key_pressed = call IOManager.get_key()
+		if key_pressed then
+			if key_pressed == "UP ARROW" and not delta_y > 0  then
+				delta_y = -2
+				delta_x = 0
+			else if key_pressed == "DOWN ARROW" and not delta_y < 0 then
+				delta_y = 2
+				delta_x = 0
+			else if key_pressed == "LEFT ARROW" and not delta_x > 0 then
+				delta_x = -2
+				delta_y = 0
+			else if key_pressed == "RIGHT ARROW" and not delta_x < 0 then
+				delta_x = 2
+				delta_y = 0
+			stop
+		stop
+	stop
+
+	define method update()
+		# Run all updates that should be run in each frame
+		call find_direction()
+		call move()
+		call intersecting()
+		if not call window.inside(body[1]) then alive = False stop
+	stop
+
+	define method get_head()
+		# Returns the head of the snake
+		return body[1]
+	stop
+
+	define method move()
+		# Move the snake by moving the head and then the rest of the body will follow
+		old_position = []
+		count node from 1 to call body.length()
+			if node == 1 then
+				old_position = call body[node].get_position()
+				call body[node].move(delta_y, delta_x)
+			else
+				temp_position = call body[node].get_position()
+				call body[node].set_position(old_position[1], old_position[2])
+				old_position = temp_position		
+			stop
+		stop
+
+		if eating then
+			call body.append(call window.add(old_position[1], old_position[2], BLOCK_SIZE, BLOCK_SIZE, "dark_red"))
+			eating = False
+		stop
+			
+	stop
+
+	define method intersecting()
+		# Detect if the snake is intersecting with itself	
+		
+		head = body[1]
+
+		if call body.length() < 2 then return stop
+		
+		count node from 2 to call body.length()
+			if call head.intersects_with(body[node]) then
+				alive = False
+			stop
+		stop
+	stop
+
+	define method eat()
+		eating = True
+	stop
+stop
+
+define function find_food_position()
+	# This function makes sure the new food position is not inside the snake
+	
+	found_position = False
+	new_x = 0
+	new_y = 0
+
+	while not found_position
+		new_x = call RandOpManager.get_integer(0, WINDOW_WIDTH-BLOCK_SIZE)
+		new_y = call RandOpManager.get_integer(0, WINDOW_HEIGHT-BLOCK_SIZE)
+		if new_x % 2 == 1 then new_x = new_x - 1 stop
+		if new_y % 2 == 1 then new_y = new_y - 1 stop
+		call food.set_position(new_x, new_y)
+		found_position = True
+		for every node in snake@body
+			if call food.intersects_with(node) then
+				found_position = False
+			stop
+		stop
+	stop
+stop
+
+define function show_highscores(database)
+	results = call database.select("records", "points").flip().slice(1, 5)
+
+	display "\nHIGHSCORES:\n"
+	header = call "Name:".left_justify(20)
+	header = header + call "Score:".left_justify(15)
+	header = header + call "Date:".left_justify(20)
+	display header
+	display "=" * 60
+	
+	for every result in results
+		formatted_line = ""
+		formatted_line += call result["name"].left_justify(20)
+		formatted_line +=  call result["points"].convert_to_text().left_justify(4)
+		formatted_line += call " points".left_justify(15)
+		formatted_line += call result["date"].left_justify(20)
+		display formatted_line
+	stop
+stop
+
+# Game constants
+WINDOW_HEIGHT = 30
+WINDOW_WIDTH = 30
+BLOCK_SIZE = 1
+FPS = 8
+
+# Create the game window
+window = create Canvas()
+call window.set_dimensions(WINDOW_WIDTH, WINDOW_HEIGHT)
+
+# Create the database to store the highscores
+db = create Database()
+call db.connect("highscores")
+call db.create_table("records", ["name", "points", "date"])
+
+# Create the snake
+snake = create Snake()
+
+# Create food
+food = call window.add(20, 20, BLOCK_SIZE, BLOCK_SIZE, "blue")
+
+# Initialize the scoreboard
+points = 0
+
+while snake@alive
+	call window.fill("green")
+	call window.update()
+	call window.render()
+	call snake.update()
+
+	if call snake.get_head().intersects_with(food) then
+		call snake.eat()
+		call find_food_position()
+		points = points + 1
+	stop
+	call SystemManager.wait(1/FPS)
+stop
+
+display "GAME OVER!"
+display "Whats your name?"
+let user assign name
+date = call TimeManager.now().convert_to_text()
+call db.insert_into("records", [name, points, date])
+call show_highscores(db)

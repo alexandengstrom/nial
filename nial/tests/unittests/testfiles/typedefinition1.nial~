@@ -1,0 +1,7 @@
+define type Single
+	attribute = 3
+	define method constructor()
+	stop
+stop
+
+object = create Single()

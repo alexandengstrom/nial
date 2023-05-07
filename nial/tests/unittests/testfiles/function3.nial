@@ -1,0 +1,12 @@
+# Variable a should not be available for function y.
+
+define function x()
+       a = 3
+stop
+
+define function y()
+       display a
+stop
+
+call x()
+call y()

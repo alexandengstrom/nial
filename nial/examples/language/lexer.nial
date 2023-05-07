@@ -1,0 +1,57 @@
+use "token.nial"
+use "token_type.nial"
+
+define type Lexer
+	$ The lexer is responsible for tokenizing a string $
+	
+	available_tokens = []
+	$ Stores a list of available match patterns $
+	
+	define method constructor()
+		$ Creates the lexer $
+		call define_tokens()
+	stop
+
+	define method define_tokens()
+		$ Define all the available match patterns $
+		call available_tokens.append([TokenType@NUMBER, "\d+", |t|call t.convert_to_number()|])
+		call available_tokens.append([TokenType@ADDITION, "\+", |t|t|])
+		call available_tokens.append([TokenType@SUBTRACTION, "\-", |t|t|])
+	  call available_tokens.append([TokenType@MULTIPLICATION, "\*", |t|t|])
+	  call available_tokens.append([TokenType@DIVISION, "\/", |t|t|])
+		call available_tokens.append([TokenType@SPACE, "\s", |t|t|])
+		call available_tokens.append([TokenType@LESS_THAN, "<", |t|t|])
+		call available_tokens.append([TokenType@GREATER_THAN, ">", |t|t|])
+		call available_tokens.append([TokenType@EQUALS, "==", |t|t|])
+		call available_tokens.append([TokenType@AND, "and", |t|t|])
+		call available_tokens.append([TokenType@OR, "or", |t|t|])
+	stop
+
+	define method tokenize(string)
+		$ Takes a string as input, returns an token stream $
+		tokens = []
+		position = 1
+		while string
+			token_found = False
+			for every token in available_tokens
+				match = call string.match(token[2])
+				if match then
+					token_found = True
+					found = create Token(token[1], call token[3](match))
+					if token[1] != TokenType@SPACE then
+						call tokens.append(found)
+					stop
+					match_length = call match.length()
+					string_length = call string.length()
+					string = call string.slice(match_length+1, string_length)
+					break
+				stop
+			stop
+			if not token_found then
+				display "Unvalid char error!"
+				return
+			stop
+		stop
+		return tokens
+	stop
+stop

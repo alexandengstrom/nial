@@ -1,0 +1,14 @@
+require "test/unit"
+require "./datatypes/number"
+require "./datatypes/text"
+require "./interpreter/scope"
+
+class Test_Number < Test::Unit::TestCase
+  def test_addition
+    x = Number.new(3)
+    y = Number.new(4)
+    z = x.addition(y)
+
+    assert_equal(Number, z)
+  end
+end

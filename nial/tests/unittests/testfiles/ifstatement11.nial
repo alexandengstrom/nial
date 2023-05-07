@@ -1,0 +1,7 @@
+define function func()
+       1+1
+stop
+
+if func then
+   3 / 0
+stop

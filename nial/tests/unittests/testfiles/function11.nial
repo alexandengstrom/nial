@@ -1,0 +1,5 @@
+define function test(bool)
+       x = 2
+stop
+
+call test(True and Null)

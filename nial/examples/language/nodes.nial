@@ -1,0 +1,62 @@
+define type BinOpNode
+	$ Represents a binary operation between two other nodes $
+	
+	left = Null
+	$ The left operand $
+	
+	right = Null
+	$ The right operand $
+	
+	operator = Null
+	$ The operator $
+
+	define method constructor(l, r, o)
+		$ Create the node $
+		left = l
+		right = r
+		operator = o
+	stop
+
+	define method evaluate()
+		$ Evaluates the left node, right node and the result of the operation $
+		left = call left.evaluate()
+		right = call right.evaluate()
+
+		if operator == TokenType@ADDITION then
+			return left + right
+		else if operator == TokenType@SUBTRACTION then
+			return left - right
+		else if operator == TokenType@MULTIPLICATION then
+			return left * right
+		else if operator == TokenType@DIVISION then
+			return left / right
+		else if operator == TokenType@LESS_THAN then
+			return left < right
+		else if operator == TokenType@GREATER_THAN then
+			return left > right
+		else if operator == TokenType@EQUALS then
+			return left == right
+		else if operator == TokenType@AND then
+			return left and right
+		else if operator == TokenType@OR then
+			return left or right
+		stop
+	stop
+stop
+
+define type NumberNode
+	$ Represents a number $
+	
+	value = Null
+	$ The value of the number $
+	
+	define method constructor(n)
+		$ Create the node $
+		value = n
+	stop
+
+	define method evaluate()
+		$ Returns the value of the number $
+		return value@value
+	stop
+stop

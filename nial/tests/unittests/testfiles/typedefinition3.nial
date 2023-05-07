@@ -1,0 +1,16 @@
+define type Single
+	first = 1
+	define method constructor(f)
+		first = f
+	stop
+
+	define method set_first(new_value)
+		first = call square(new_value)
+	stop
+
+	define method square(value)
+		return value * value
+	stop		
+stop
+
+object = create Single(3)

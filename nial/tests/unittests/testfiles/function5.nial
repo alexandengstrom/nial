@@ -1,0 +1,5 @@
+define function test(paramx)
+       display "hello world"
+stop
+
+call test()

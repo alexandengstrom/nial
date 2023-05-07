@@ -1,0 +1,117 @@
+############################################
+# Oneline if-statement
+
+if 3 > 2 then display 4 stop
+
+############################################
+# One if-statement on different lines
+
+if 3 > 2 or 2 == 2 then
+   var = 4
+stop
+
+############################################
+# If-statement with else-block
+
+if 3==3 then
+   var = 4
+else
+   var = 5
+stop
+
+############################################
+# If-statement with variable assignment
+
+if 3 != 2 then
+   x = 2
+stop
+
+############################################
+# If-statement with elsif but no else
+
+if 2>1 then
+   x = 1
+else if 3>1 then
+   x = 2
+stop
+
+############################################
+# If-statement with many elsifs but no else
+
+if 2>1 then
+   x = 1
+else if 3 > 1 then
+   x = 2
+else if 4 > 1 then
+   x = 3
+else if 5 > 1 then
+   x = 4
+stop
+   
+############################################
+# If-statements with many elsifs and else.
+
+if 2>1 then
+   x = 1
+else if 3 > 1 then
+   x = 2
+else if 4 > 1 then
+   x = 3
+else if 5 > 1 then
+   x = 4
+else
+   x = 5
+stop
+
+############################################
+# Should not return division by zero since we dont enter the branch
+
+if 3 > 4 then
+   3 / 0
+else if 4 > 5 then
+   3 / 0
+stop
+
+############################################
+# Numbers and text should convert to booleans
+
+if 3 then
+   2+2
+stop
+
+if "text" then
+   2+2
+stop
+
+############################################
+# Empty strings and zero should be false
+
+if 0 then
+   3 / 0
+stop
+
+if "" then
+   3 / 0
+stop
+
+############################################
+# Should be able to redefine a variable inside a if-statement
+
+x = 0
+
+if x == 0 then
+   x = 2
+stop
+
+y = 2 / x
+
+############################################
+# True and False
+
+if True then
+   x = 2
+stop
+
+if False then
+   3 / 0
+stop

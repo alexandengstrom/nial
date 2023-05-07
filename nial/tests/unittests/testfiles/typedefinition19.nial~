@@ -1,0 +1,14 @@
+define type Person
+	age = 3
+	height = 186
+	weight = 80
+	define method constructor()
+		x = 2
+	stop
+stop
+
+person = create Person()
+
+for every item in person
+	x = 2
+stop

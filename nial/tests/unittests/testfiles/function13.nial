@@ -1,0 +1,15 @@
+define function dividebyzero(num)
+       if num == 9 then
+       	  return 1
+       else if num == 8 then
+       	  return 1
+       else if num == 7 then
+          return 1
+       else if num == 6 then
+          return 0
+       else if num == 5 then
+          return 1
+       stop
+stop
+
+2 / call dividebyzero(6)

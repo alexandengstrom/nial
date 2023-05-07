@@ -1,0 +1,3 @@
+x = ["hello", "world"]
+
+y = x[3]

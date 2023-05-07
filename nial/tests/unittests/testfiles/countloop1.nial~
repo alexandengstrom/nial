@@ -1,0 +1,3 @@
+count x from 1 to 10
+      y = x
+stop

@@ -1,0 +1,19 @@
+define type TestType
+	attribute = Null
+	define method constructor(att)
+		attribute = att
+	stop
+
+	define method thecounter()
+		count x from 1 to 10
+			y = x
+		stop
+	stop
+
+	define method test_method(x)
+		call thecounter()
+		return x
+	stop
+stop
+
+object = create TestType(False)

@@ -1,0 +1,7 @@
+if 2 > 1 then
+   x = 2
+else
+   x = 3
+else if 4 > 4 then
+   x = 4
+stop

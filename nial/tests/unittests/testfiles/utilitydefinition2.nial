@@ -1,0 +1,7 @@
+define utility Math
+	PI = 3.14
+
+	define method addition(num1, num2)
+		return num1 + num2
+	stop
+stop

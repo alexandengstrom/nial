@@ -1,0 +1,657 @@
+# coding: utf-8
+require "test/unit"
+require "./datatypes/number"
+require "./datatypes/text"
+require "./datatypes/boolean"
+require "./datatypes/function"
+require_relative "../scope/scope"
+
+class Test_Text < Test::Unit::TestCase
+  def test_addition
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    
+    x = Text.new("hello ")
+    y = Text.new("world")
+    z = x.addition(y, scope, position)
+    assert_equal(Text, z.class)
+    assert_equal("hello world", z.value)
+
+    x = Text.new("")
+    y = Text.new("world")
+    z = x.addition(y, scope, position)
+    assert_equal(Text, z.class)
+    assert_equal("world", z.value)
+
+    x = Text.new("")
+    y = Text.new("")
+    z = x.addition(y, scope, position)
+    assert_equal(Text, z.class)
+    assert_equal("", z.value)
+
+    x = Text.new("lets test a longer string")
+    y = Text.new("and another one")
+    z = x.addition(y, scope, position)
+    assert_equal(Text, z.class)
+    assert_equal("lets test a longer stringand another one", z.value)
+
+    # Test exceptions
+    x = Text.new("hello world")
+    y = Number.new(5)
+    z = x.addition(y, scope, position)
+    assert_equal(InvalidOperator, z.class)
+
+    x = Text.new("hello world")
+    y = Boolean.new(false)
+    z = x.addition(y, scope, position)
+    assert_equal(InvalidOperator, z.class)
+
+    x = Text.new("hello world")
+    y = Function.new(nil, nil, nil)
+    z = x.addition(y, scope, position)
+    assert_equal(InvalidOperator, z.class)
+  end
+
+  def test_multiplication
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    
+    x = Text.new("hello")
+    y = Number.new(3)
+    z = x.multiplication(y, scope, position)
+    assert_equal(Text, z.class)
+    assert_equal("hellohellohello", z.value)
+
+    x = Text.new("hello")
+    y = Number.new(0)
+    z = x.multiplication(y, scope, position)
+    assert_equal(Text, z.class)
+    assert_equal("", z.value)
+
+    # Test exceptions
+    x = Text.new("hello")
+    y = Text.new("world")
+    z = x.multiplication(y, scope, position)
+    assert_equal(InvalidOperator, z.class)
+
+    x = Text.new("hello")
+    y = Boolean.new(true)
+    z = x.multiplication(y, scope, position)
+    assert_equal(InvalidOperator, z.class)
+    
+    x = Text.new("hello")
+    y = Function.new(nil, nil, nil)
+    z = x.multiplication(y, scope, position)
+    assert_equal(InvalidOperator, z.class)
+  end
+
+  def test_equals
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    
+    x = Text.new("hello")
+    y = Text.new("hello")
+    z = x.equals(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(true, z.value)
+
+    x = Text.new("helli")
+    y = Text.new("hello")
+    z = x.equals(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(false, z.value)
+
+    x = Text.new("hellohello")
+    y = Text.new("hello")
+    z = x.equals(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(false, z.value)
+
+    x = Text.new("hellohello")
+    y = Function.new(nil, nil, nil)
+    z = x.equals(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(false, z.value)
+
+    x = Text.new("hellohello")
+    y = Boolean.new(true)
+    z = x.equals(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(true, z.value)
+
+    x = Text.new("hellohello")
+    y = Boolean.new(false)
+    z = x.equals(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(false, z.value)
+
+    x = Text.new("")
+    y = Boolean.new(true)
+    z = x.equals(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(false, z.value)
+
+    x = Text.new("")
+    y = Boolean.new(false)
+    z = x.equals(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(true, z.value)
+
+    x = Text.new("")
+    y = Number.new(0)
+    z = x.equals(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(true, z.value)
+
+    x = Text.new("hello")
+    y = Number.new(0)
+    z = x.equals(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(false, z.value)
+  end
+
+  def test_not_equals
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    
+    x = Text.new("hello")
+    y = Text.new("hello")
+    z = x.not_equals(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(false, z.value)
+
+    x = Text.new("helli")
+    y = Text.new("hello")
+    z = x.not_equals(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(true, z.value)
+
+    x = Text.new("hellohello")
+    y = Text.new("hello")
+    z = x.not_equals(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(true, z.value)
+
+    x = Text.new("hellohello")
+    y = Function.new(nil, nil, nil)
+    z = x.not_equals(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(true, z.value)
+
+    x = Text.new("hellohello")
+    y = Boolean.new(true)
+    z = x.not_equals(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(false, z.value)
+
+    x = Text.new("hellohello")
+    y = Boolean.new(false)
+    z = x.not_equals(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(true, z.value)
+
+    x = Text.new("")
+    y = Boolean.new(true)
+    z = x.not_equals(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(true, z.value)
+
+    x = Text.new("")
+    y = Boolean.new(false)
+    z = x.not_equals(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(false, z.value)
+
+    x = Text.new("")
+    y = Number.new(0)
+    z = x.not_equals(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(false, z.value)
+
+    x = Text.new("hello")
+    y = Number.new(0)
+    z = x.not_equals(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(true, z.value)
+  end
+
+  def test_greater_than
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    
+    x = Text.new("hello")
+    y = Text.new("hello")
+    z = x.greater_than(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(false, z.value)
+
+    x = Text.new("hello")
+    y = Text.new("hi")
+    z = x.greater_than(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(true, z.value)
+
+    x = Text.new("hi")
+    y = Text.new("hello")
+    z = x.greater_than(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(false, z.value)
+
+    x = Text.new("hi")
+    y = Number.new(3)
+    z = x.greater_than(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(false, z.value)
+
+    x = Text.new("hello")
+    y = Number.new(3)
+    z = x.greater_than(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(true, z.value)
+
+    x = Text.new("hello")
+    y = Number.new(5)
+    z = x.greater_than(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(false, z.value)
+
+    # Test exceptions
+    x = Text.new("hello")
+    y = Boolean.new(false)
+    z = x.greater_than(y, scope, position)
+    assert_equal(InvalidOperator, z.class)
+
+    x = Text.new("hello")
+    y = Function.new(nil, nil, nil)
+    z = x.greater_than(y, scope, position)
+    assert_equal(InvalidOperator, z.class)    
+  end
+
+  def test_less_than
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    
+    x = Text.new("hello")
+    y = Text.new("hello")
+    z = x.less_than(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(false, z.value)
+
+    x = Text.new("hello")
+    y = Text.new("hi")
+    z = x.less_than(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(false, z.value)
+
+    x = Text.new("hi")
+    y = Text.new("hello")
+    z = x.less_than(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(true, z.value)
+
+    x = Text.new("hi")
+    y = Number.new(3)
+    z = x.less_than(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(true, z.value)
+
+    x = Text.new("hello")
+    y = Number.new(3)
+    z = x.less_than(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(false, z.value)
+
+    x = Text.new("hello")
+    y = Number.new(5)
+    z = x.less_than(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(false, z.value)
+
+    # Test exceptions
+    x = Text.new("hello")
+    y = Boolean.new(false)
+    z = x.less_than(y, scope, position)
+    assert_equal(InvalidOperator, z.class)
+
+    x = Text.new("hello")
+    y = Function.new(nil, nil, nil)
+    z = x.less_than(y, scope, position)
+    assert_equal(InvalidOperator, z.class)    
+  end
+
+  def test_equals_or_greater_than
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    
+    x = Text.new("hello")
+    y = Text.new("hello")
+    z = x.equals_or_greater_than(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(true, z.value)
+
+    x = Text.new("hello")
+    y = Text.new("hi")
+    z = x.equals_or_greater_than(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(true, z.value)
+
+    x = Text.new("hi")
+    y = Text.new("hello")
+    z = x.equals_or_greater_than(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(false, z.value)
+
+    x = Text.new("hi")
+    y = Number.new(3)
+    z = x.equals_or_greater_than(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(false, z.value)
+
+    x = Text.new("hello")
+    y = Number.new(3)
+    z = x.equals_or_greater_than(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(true, z.value)
+
+    x = Text.new("hello")
+    y = Number.new(5)
+    z = x.equals_or_greater_than(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(true, z.value)
+
+    # Test exceptions
+    x = Text.new("hello")
+    y = Boolean.new(false)
+    z = x.equals_or_greater_than(y, scope, position)
+    assert_equal(InvalidOperator, z.class)
+
+    x = Text.new("hello")
+    y = Function.new(nil, nil, nil)
+    z = x.equals_or_greater_than(y, scope, position)
+    assert_equal(InvalidOperator, z.class)
+  end
+
+  def test_equals_or_less_than
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    
+    x = Text.new("hello")
+    y = Text.new("hello")
+    z = x.equals_or_less_than(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(true, z.value)
+
+    x = Text.new("hello")
+    y = Text.new("hi")
+    z = x.equals_or_less_than(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(false, z.value)
+
+    x = Text.new("hi")
+    y = Text.new("hello")
+    z = x.equals_or_less_than(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(true, z.value)
+
+    x = Text.new("hi")
+    y = Number.new(3)
+    z = x.equals_or_less_than(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(true, z.value)
+
+    x = Text.new("hello")
+    y = Number.new(3)
+    z = x.equals_or_less_than(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(false, z.value)
+
+    x = Text.new("hello")
+    y = Number.new(5)
+    z = x.equals_or_less_than(y, scope, position)
+    assert_equal(Boolean, z.class)
+    assert_equal(true, z.value)
+
+    # Test exceptions
+    x = Text.new("hello")
+    y = Boolean.new(false)
+    z = x.equals_or_less_than(y, scope, position)
+    assert_equal(InvalidOperator, z.class)
+
+    x = Text.new("hello")
+    y = Function.new(nil, nil, nil)
+    z = x.equals_or_less_than(y, scope, position)
+    assert_equal(InvalidOperator, z.class)
+  end
+
+  def test_invalid_operators
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    
+    x = Text.new("hello")
+    y = Text.new("hello")
+    z = x.subtraction(y, scope, position)
+    assert_equal(InvalidOperator, z.class)
+
+    x = Text.new("hello")
+    y = Text.new("hello")
+    z = x.division(y, scope, position)
+    assert_equal(InvalidOperator, z.class)
+
+    x = Text.new("hello")
+    y = Text.new("hello")
+    z = x.modulo(y, scope, position)
+    assert_equal(InvalidOperator, z.class)    
+  end
+
+  def test_length
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    
+    x = Text.new("hello")
+    z = x.length(scope, position)
+    assert_equal(Number, z.class)
+    assert_equal(5, z.value)
+
+    x = Text.new("")
+    z = x.length(scope, position)
+    assert_equal(Number, z.class)
+    assert_equal(0, z.value)
+
+    x = Text.new("åäö")
+    z = x.length(scope, position)
+    assert_equal(Number, z.class)
+    assert_equal(3, z.value)
+
+    x = Text.new("hello hello")
+    z = x.length(scope, position)
+    assert_equal(Number, z.class)
+    assert_equal(11, z.value)
+  end
+
+  def test_convert_to_number
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    
+    x = Text.new("1")
+    z = x.convert_to_number(scope, position)
+    assert_equal(Number, z.class)
+    assert_equal(Integer, z.value.class)
+    assert_equal(1, z.value)
+
+    x = Text.new("111")
+    z = x.convert_to_number(scope, position)
+    assert_equal(Number, z.class)
+    assert_equal(Integer, z.value.class)
+    assert_equal(111, z.value)
+
+    x = Text.new("1.2")
+    z = x.convert_to_number(scope, position)
+    assert_equal(Number, z.class)
+    assert_equal(Float, z.value.class)
+    assert_equal(1.2, z.value)
+
+    x = Text.new("-1.2")
+    z = x.convert_to_number(scope, position)
+    assert_equal(Number, z.class)
+    assert_equal(Float, z.value.class)
+    assert_equal(-1.2, z.value)
+
+    x = Text.new("-500")
+    z = x.convert_to_number(scope, position)
+    assert_equal(Number, z.class)
+    assert_equal(Integer, z.value.class)
+    assert_equal(-500, z.value)
+
+    x = Text.new("00000000")
+    z = x.convert_to_number(scope, position)
+    assert_equal(Number, z.class)
+    assert_equal(Integer, z.value.class)
+    assert_equal(0, z.value)
+
+    x = Text.new("000000001")
+    z = x.convert_to_number(scope, position)
+    assert_equal(Number, z.class)
+    assert_equal(Integer, z.value.class)
+    assert_equal(1, z.value)
+  end
+
+  def test_upper
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    
+    x = Text.new("hej")
+    z = x.upper(scope, position)
+    assert_equal(Text, z.class)
+    assert_equal("HEJ", z.value)
+
+    x = Text.new("hej23")
+    z = x.upper(scope, position)
+    assert_equal(Text, z.class)
+    assert_equal("HEJ23", z.value)
+
+    x = Text.new("test TEST")
+    z = x.upper(scope, position)
+    assert_equal(Text, z.class)
+    assert_equal("TEST TEST", z.value)
+
+    x = Text.new("")
+    z = x.upper(scope, position)
+    assert_equal(Text, z.class)
+    assert_equal("", z.value)
+  end
+
+  def test_lower
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    
+    x = Text.new("TEST")
+    z = x.lower(scope, position)
+    assert_equal(Text, z.class)
+    assert_equal("test", z.value)
+
+    x = Text.new("TEst23")
+    z = x.lower(scope, position)
+    assert_equal(Text, z.class)
+    assert_equal("test23", z.value)
+
+    x = Text.new("TEst TEST")
+    z = x.lower(scope, position)
+    assert_equal(Text, z.class)
+    assert_equal("test test", z.value)
+
+    x = Text.new("123")
+    z = x.lower(scope, position)
+    assert_equal(Text, z.class)
+    assert_equal("123", z.value)
+
+    x = Text.new("")
+    z = x.lower(scope, position)
+    assert_equal(Text, z.class)
+    assert_equal("", z.value)
+  end
+
+  def test_strip
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    
+    x = Text.new("test")
+    z = x.strip(scope, position)
+    assert_equal(Text, z.class)
+    assert_equal("test", z.value)
+
+    x = Text.new("     test")
+    z = x.strip(scope, position)
+    assert_equal(Text, z.class)
+    assert_equal("test", z.value)
+
+    x = Text.new("test      ")
+    z = x.strip(scope, position)
+    assert_equal(Text, z.class)
+    assert_equal("test", z.value)
+
+    x = Text.new("    test  ")
+    z = x.strip(scope, position)
+    assert_equal(Text, z.class)
+    assert_equal("test", z.value)
+
+    x = Text.new("   test test     ")
+    z = x.strip(scope, position)
+    assert_equal(Text, z.class)
+    assert_equal("test test", z.value)
+
+    x = Text.new("    ")
+    z = x.strip(scope, position)
+    assert_equal(Text, z.class)
+    assert_equal("", z.value)
+  end
+
+  def test_left_justify
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    
+    x = Text.new("test")
+    z = x.left_justify(Number.new(10), scope, position)
+    assert_equal(Text, z.class)
+    assert_equal("test      ", z.value)
+
+    x = Text.new("test")
+    z = x.left_justify(Number.new(-10), scope, position)
+    assert_equal(Text, z.class)
+    assert_equal("test", z.value)
+
+    x = Text.new("test")
+    z = x.left_justify(Text.new("test"), scope, position)
+    assert_equal(InvalidDatatype, z.class)
+  end
+
+  def test_right_justify
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    
+    x = Text.new("test")
+    z = x.right_justify(Number.new(10), scope, position)
+    assert_equal(Text, z.class)
+    assert_equal("      test", z.value)
+
+    x = Text.new("test")
+    z = x.right_justify(Number.new(-10), scope, position)
+    assert_equal(Text, z.class)
+    assert_equal("test", z.value)
+
+    x = Text.new("test")
+    z = x.right_justify(Text.new("test"), scope, position)
+    assert_equal(InvalidDatatype, z.class)
+  end
+
+  def test_sub
+    position = Position.new(1,1,1)
+    scope = Scope.new("global", nil, position)
+    
+    x = Text.new("a string to test")
+    pattern = Text.new("string")
+    new_value = Text.new("new string")
+    z = x.sub(pattern, new_value, scope, position)
+    assert_equal(Text, z.class)
+    assert_equal("a new string to test", z.value)
+  end
+end

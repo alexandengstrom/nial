@@ -1,0 +1,3 @@
+count x from 1 to 1/0
+      y = x
+stop

@@ -1,0 +1,5 @@
+define utility Action
+	START = 1
+	STOP = 2
+	PAUSE = 3
+stop

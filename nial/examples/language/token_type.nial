@@ -1,0 +1,37 @@
+define utility TokenType
+	$ Enum for representing token types $
+	
+	SPACE = 0
+	$ A space char $
+	
+	NUMBER = 1
+	$ A number $
+	
+	ADDITION = 2
+	$ The symbol + $ 
+	
+	SUBTRACTION = 3
+	$ The symbol - $
+	
+	DIVISION = 4
+	$ The symbol / $
+	
+	MULTIPLICATION = 5
+	$ The symbol * $
+
+	GREATER_THAN = 6
+	$ The symbol > $
+
+	LESS_THAN = 7
+	$ The symbol < $
+
+	EQUALS = 8
+	$ The symbol == $
+
+	AND = 9
+	$ The operator and $
+
+	OR = 10
+	$ The operator or $
+	
+stop
