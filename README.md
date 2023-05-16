@@ -50,6 +50,9 @@ define function bubblesort(list, func)
   return list
 stop
 ```
+
+In the directory nial/examples you will find more advanced examples of how to write code in Nial.
+
 ## Implementation
 The Nial programming language is built around three main components: the lexer, parser, and interpreter. These components work together to process and execute Nial source code. Additionally, there is a main program that connects these parts and facilitates the execution of Nial programs.
 
