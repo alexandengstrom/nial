@@ -1,7 +1,7 @@
 # Nial
-Nial is a beginner-friendly, object-oriented programming language written in Ruby. It features an easy-to-read syntax that is specifically designed to make programming accessible for newcomers.
+Nial is a **beginner-friendly**, *object-oriented programming language* written in Ruby. It features an easy-to-read syntax that is specifically designed to make programming accessible for newcomers.
 
-Despite its focus on simplicity, Nial also incorporates advanced features such as polymorphism and inheritance, enabling developers to write more complex and sophisticated programs. The language embraces dynamic typing, allowing for flexibility and adaptability during the development process.
+Despite its focus on simplicity, Nial also incorporates advanced features such as **polymorphism** and **inheritance**, enabling developers to write more complex and sophisticated programs. The language embraces *dynamic typing*, allowing for flexibility and adaptability during the development process.
 
 ## Installation Guide
 To get started with Nial, follow these steps:
@@ -26,7 +26,7 @@ nial example.nial
 Congratulations! You have successfully installed Nial on your machine. You are now ready to create and run your own Nial programs.
 
 ## Usage
-To use the Nial programming language, please refer to the full documentation and user manual available in the file nial.pdf. This comprehensive resource provides detailed explanations of the language syntax, features, and usage examples. Please note that the documentation is in Swedish.
+To use the Nial programming language, please refer to the full documentation and user manual available in the file [nial.pdf](nial.pdf). This comprehensive resource provides detailed explanations of the language syntax, features, and usage examples. Please note that the documentation is in **Swedish**.
 
 Here is an example of the Bubble Sort algorithm in Nial:
 ```
@@ -54,7 +54,7 @@ stop
 In the directory nial/examples you will find more advanced examples of how to write code in Nial.
 
 ## Implementation
-The Nial programming language is built around three main components: the lexer, parser, and interpreter. These components work together to process and execute Nial source code. Additionally, there is a main program that connects these parts and facilitates the execution of Nial programs.
+The Nial programming language is built around three main components: the **lexer**, **parser**, and **interpreter**. These components work together to process and execute Nial source code. Additionally, there is a main program that connects these parts and facilitates the execution of Nial programs.
 
 1. **Lexer**: The lexer plays a crucial role in the Nial system. It scans the source code and translates it into a stream of tokens. Tokens are atomic units of the language, such as keywords, identifiers, operators, and literals. The lexer ensures that the source code is properly segmented for further processing.
 2. **Parser**: Once the lexer has generated the stream of tokens, the parser comes into play. The parser takes this token stream and constructs an abstract syntax tree (AST) based on the grammar and rules of the Nial language. The AST represents the structure and hierarchy of the code, capturing the relationships between different language elements.
@@ -73,10 +73,10 @@ Here is the formal grammar of the Nial language, specified using Backus-Naur For
   <statements>         ::=    <statement> { <statements> } |
                               empty
 
-  <loop statements>    ::=    ( <statement> | ``break'' | ``next'' ) { <loop statements> } |
+  <loop statements>    ::=    ( <statement> | "break" | "next" ) { <loop statements> } |
                               empty
 
-  <func statements>    ::=    ( <statement> | ``return'' [expr] ) { <func statements> } |
+  <func statements>    ::=    ( <statement> | "return" [expr] ) { <func statements> } |
                               empty
                               
   <statement>          ::=    <control structure>
@@ -90,139 +90,139 @@ Here is the formal grammar of the Nial language, specified using Backus-Naur For
                               <expr>
                               <comment>
                               
-  <import>             ::=    ``use'' <expr>
+  <import>             ::=    "use" <expr>
                               
-  <try block>          ::=    ``try'' <statements>
-                              { ``catch'' <type identifier> <statements> }
-                              [ ``else'' <statements> ]
-                              ``stop''
+  <try block>          ::=    "try" <statements>
+                              { "catch" <type identifier> <statements> }
+                              [ "else" <statements> ]
+                              "stop"
                               
-  <file read>          ::=    ``load'' <expr> ``into'' <identifier>
+  <file read>          ::=    "load" <expr> "into" <identifier>
                               
   <io>                 ::=    <input> | <output>
 
-  <output>             ::=    ``display'' <expr>
+  <output>             ::=    "display" <expr>
 
-  <input>              ::=    ``let user assign'' <identifier>
+  <input>              ::=    "let user assign" <identifier>
   
   <control structure>  ::=    <range loop> |
                               <list loop> |
                               <while loop> |
                               <if statement>
 
-  <range loop>         ::=   ``count'' <identifier> ``from'' <expression> ``to'' <expression>
+  <range loop>         ::=   "count" <identifier> "from" <expression> "to" <expression>
                              <loop statements>
-                             ``stop''
+                             "stop"
 
-  <list loop>          ::=   ``for every'' { ``copy'' }  <identifier> ``in'' <expr>
+  <list loop>          ::=   "for every" { "copy" }  <identifier> "in" <expr>
                              <loop statements>
-                             ``stop''
+                             "stop"
 
-  <while loop>         ::=   ``while'' <logical expression> <loop statements> ``stop''                           
+  <while loop>         ::=   "while" <logical expression> <loop statements> "stop"                           
                              
-  <if statement>       ::=   ``if'' <condition> ``then'' <loop statements>
-                             { ``else if'' <condition> ``then'' <statements> }
-                             [ ``else'' <statements> ]
-                             ``stop''
+  <if statement>       ::=   "if" <condition> "then" <loop statements>
+                             { "else if" <condition> "then" <statements> }
+                             [ "else" <statements> ]
+                             "stop"
 
-  <type definition>    ::=   ``define type'' <type identifier>
-                             [``extend'' <type identifier>]
+  <type definition>    ::=   "define type" <type identifier>
+                             ["extend" <type identifier>]
                              {var assign}
-                             ``define method'' ``constructor'' ``(`` <params> ``)''
-                             <func statements> ``stop''
+                             "define method" "constructor" "(" <params> ")"
+                             <func statements> "stop"
                              {method definition}
-                             ``stop''
+                             "stop"
 
-  <utility definition> ::=   ``define utility'' <type identifier>
-                             { <const assign> } { <method definition> } ``stop''
+  <utility definition> ::=   "define utility" <type identifier>
+                             { <const assign> } { <method definition> } "stop"
 
   
-  <method definition>  ::=   ``define method'' <identifier> ``(`` <params> ``)''
-                             <func statements> ``stop''
+  <method definition>  ::=   "define method" <identifier> "(" <params> ")"
+                             <func statements> "stop"
 
 
-  <func definition>    ::=   ``define function'' <identifier> ``(`` <params> ``)''
-                             <func statements> ``stop''
+  <func definition>    ::=   "define function" <identifier> "(" <params> ")"
+                             <func statements> "stop"
   
 
-  <expr>              ::=    <expr> <assign op> <log expr> |
-                             <var assign>
-                             <log expr>
+  <expr>               ::=    <expr> <assign op> <log expr> |
+                              <var assign>
+                              <log expr>
 
-  <var assign>        ::=    <identifier> ``='' <expr>
+  <var assign>         ::=    <identifier> "=" <expr>
 
-  <const assign>      ::=    <constant> ``='' <expr>
+  <const assign>       ::=    <constant> "=" <expr>
   
-  <assign op>         ::=    ``+='' | ``-='' | ``*='' | ``/=''
+  <assign op>          ::=    "+=" | "-=" | "*=" | "/="
 
-  <log expr>          ::=    <com expr> <log op> <log expr> |
-                             ``not'' <log expr> |
-                             <com expr>
+  <log expr>           ::=    <com expr> <log op> <log expr> |
+                              "not" <log expr> |
+                              <com expr>
 
-  <log op>            ::=    ``and'' | ``or''         
+  <log op>             ::=    "and" | "or"         
 
-  <com expr>          ::=     <arit expr> <com op> <com expr> |
-                              <arit expr>
+  <com expr>           ::=     <arit expr> <com op> <com expr> |
+                               <arit expr>
 
-  <com op>            ::=     ``>'' | ``>='' | ``<'' | ``<='' | ``=='' | ``!=''
+  <com op>             ::=     ">" | ">=" | "<" | "<=" | "==" | "!="
 
-  <arit expr>         ::=     <term> <arit op> <arit expr> |
-                              <term>
+  <arit expr>          ::=     <term> <arit op> <arit expr> |
+                               <term>
 
-  <arit op>           ::=     ``+'' | ``-'' 
+  <arit op>            ::=     "+" | "-" 
 
-  <term>              ::=     <factor> <term op> <term> |
-                              <factor>
+  <term>               ::=     <factor> <term op> <term> |
+                               <factor>
 
-  <term op>           ::=     ``*'' | ``/'' | ``%"
+  <term op>            ::=     "*" | "/" | "%"
 
-  <factor>            ::=    <atom> | ``(`` <expr> ``)''
+  <factor>             ::=    <atom> | "(" <expr> ")"
 
-  <atom>              ::=    <identifier> | <constant> | <number> | <text> | <bool> | <null> |
-                             <list> | <dict> | <type init> | <func call> | <method call> |
-                             <anon func> | <attr_access>
+  <atom>               ::=    <identifier> | <constant> | <number> | <text> | <bool> | <null> |
+                              <list> | <dict> | <type init> | <func call> | <method call> |
+                              <anon func> | <attr_access>
 
-  <type init>         ::=    ``create'' <type identifier> ``(`` <args> ``)''
+  <type init>          ::=    "create" <type identifier> "(" <args> ")"
                              
-  <func call>         ::=    ``call'' ( <identifier> | <anon func> ) ``(`` <args> ``)''
+  <func call>          ::=    "call" ( <identifier> | <anon func> ) "(" <args> ")"
 
-  <anon func>         ::=    ``|'' <params> ``|'' <expr> ``|''
+  <anon func>          ::=    "|" <params> "|" <expr> "|"
 
-  <method call>       ::=    ``call'' ( <expr> | <type identifier> )
-                             ( ``.'' <identifier> ``(`` <args> ``)'' ) +
+  <method call>        ::=    "call" ( <expr> | <type identifier> )
+                              ( "." <identifier> "(" <args> ")" )
   
-  <list>              ::=    ``[`` <args> ``]''                        
+  <list>               ::=    "[" <args> "]"                        
 
-  <params>            ::=    <identifier> { <params> } |
-                             empty
+  <params>             ::=    <identifier> { <params> } |
+                              empty
 
-  <param>             ::=    ``,'' <identifier>		     
+  <param>              ::=    "," <identifier>		     
 
-  <args>              ::=    <expr> { <arg> } |
-                             empty
+  <args>               ::=    <expr> { <arg> } |
+                              empty
 
-  <arg>               ::=    ``,'' <expr>
+  <arg>                ::=    "," <expr>
 
-  <dict>              ::=    ``{`` <dict entries> ``}''
+  <dict>               ::=    "{" <dict entries> "}"
 
-  <dict entries>      ::=    <expr> ``:'' <expr> { <dict entry> } |
-                             empty
+  <dict entries>       ::=    <expr> ":" <expr> { <dict entry> } |
+                              empty
 
-  <dict entry>        ::=    ``,'' <expr> ``:'' <expr>
+  <dict entry>         ::=    "," <expr> ":" <expr>
   
-  <constant>          ::=    /[A-Z]{2}[A-Z_0-9]*\b/
+  <constant>           ::=    /[A-Z]{2}[A-Z_0-9]*\b/
                             
-  <type identifier>   ::=    /[A-Z][\w_]*/
+  <type identifier>    ::=    /[A-Z][\w_]*/
   
-  <identifier>        ::=    /[a-z][\w_]*/
+  <identifier>         ::=    /[a-z][\w_]*/
 
-  <number>            ::=    /[0-9]+/ | /[0-9]+\.[0-9]+/
+  <number>             ::=    /[0-9]+/ | /[0-9]+\.[0-9]+/
 
-  <text>              ::=    /"(?:\\.|[^\\"])*"/
+  <text>               ::=    /"(?:\\.|[^\\"])*"/
 
-  <bool>              ::=    ``True'' | ``False''                          
+  <bool>               ::=    "True" | "False"                          
 
-  <null>              ::=    ``Null''
+  <null>               ::=    "Null"
 
-  <comment>           ::=    ``#'' /.*/ ``\n'' | ``$'' /[.*|\n]*/ ``$''
+  <comment>            ::=    "#" /.*/ \n | "$" /[.*|\n]*/ "$"
 ```
