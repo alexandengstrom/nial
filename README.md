@@ -1,4 +1,5 @@
-# Nial
+![nial-removebg-preview(1)(1)](https://github.com/alexandengstrom/nial/assets/123507241/06d61f90-098b-421e-a1db-f404dca09b7e)
+
 Nial is a **beginner-friendly**, *object-oriented programming language* written in Ruby. It features an easy-to-read syntax that is specifically designed to make programming accessible for newcomers.
 
 Despite its focus on simplicity, Nial also incorporates advanced features such as **polymorphism** and **inheritance**, enabling developers to write more complex and sophisticated programs. The language embraces *dynamic typing*, allowing for flexibility and adaptability during the development process.
