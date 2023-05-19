@@ -117,9 +117,9 @@ class Lexer
     self.add_token(:EQUALS_OR_LESS_THAN, /\<=/) { "<=" }
     self.add_token(:GREATER_THAN, /\>/) { ">" }
     self.add_token(:LESS_THAN, /\</) { "<" }
-    self.add_token(:NOT, /not/) { "not" }
-    self.add_token(:AND, /and/) { "and" }
-    self.add_token(:OR, /or/) { "or" }
+    self.add_token(:NOT, /not /) { "not" }
+    self.add_token(:AND, /and /) { "and" }
+    self.add_token(:OR, /or /) { "or" }
     self.add_token(:COPY, /copy /) {|t| t.to_s}
     self.add_token(:EXTEND, /extend/) {|t| t.to_s}
     self.add_token(:TRY, /try/) {|t| t.to_s}
